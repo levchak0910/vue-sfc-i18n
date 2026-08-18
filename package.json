@@ -1,0 +1,9 @@
+{
+  "name": "vue-sfc-i18n",
+  "packageManager": "pnpm@11.22.0",
+  "scripts": {
+    "build": "pnpm -r build",
+    "bump": "pnpm change --bump patch @vue-sfc-i18n/shared --summary",
+    "release": "corepack pnpm version -r --no-git-checks && git add -A && git commit -m 'chore: release'"
+  }
+}

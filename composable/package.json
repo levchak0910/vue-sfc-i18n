@@ -1,0 +1,23 @@
+{
+  "name": "@vue-sfc-i18n/composable",
+  "version": "0.0.0",
+  "publishConfig": {
+    "access": "public"
+  },
+  "type": "module",
+  "scripts": {
+    "build": "tsc --noEmit false --declaration true --outDir dist",
+    "type-check": "tsc --noEmit"
+  },
+  "exports": {
+    ".": "./dist/index.js"
+  },
+  "types": "./dist/index.d.ts",
+  "dependencies": {
+    "vue": "^3.5.0"
+  },
+  "devDependencies": {
+    "@types/node": "^24.12.2",
+    "typescript": "^5.9.3"
+  }
+}

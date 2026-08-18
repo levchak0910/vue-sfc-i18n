@@ -1,0 +1,25 @@
+{
+  "name": "@vue-sfc-i18n/eslint-plugin",
+  "version": "0.0.0",
+  "publishConfig": {
+    "access": "public"
+  },
+  "type": "module",
+  "scripts": {
+    "build": "tsc --noEmit false --declaration true --outDir dist",
+    "type-check": "tsc --noEmit"
+  },
+  "exports": {
+    ".": "./dist/index.js"
+  },
+  "types": "./dist/index.d.ts",
+  "dependencies": {
+    "@vue-sfc-i18n/shared": "workspace:*",
+    "eslint": "^10.3.0"
+  },
+  "devDependencies": {
+    "@types/node": "^24.12.2",
+    "typescript": "^5.9.3",
+    "vue-eslint-parser": "^10.4.0"
+  }
+}
