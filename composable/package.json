@@ -1,8 +1,29 @@
 {
   "name": "@vue-sfc-i18n/composable",
   "version": "0.0.3",
+  "description": "Vue composable for using i18n translations from Vue SFC custom blocks",
+  "keywords": [
+    "vue",
+    "vue3",
+    "i18n",
+    "sfc",
+    "composable",
+    "internationalization"
+  ],
+  "author": "Sándor Levcsák",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/levchak0910/vue-sfc-i18n.git"
+  },
+  "homepage": "git+https://github.com/levchak0910/vue-sfc-i18n#readme",
+  "bugs": {
+    "url": "git+https://github.com/levchak0910/vue-sfc-i18n/issues"
+  },
   "publishConfig": {
-    "access": "public"
+    "access": "public",
+    "registry": "https://registry.npmjs.org/",
+    "provenance": true
   },
   "type": "module",
   "scripts": {

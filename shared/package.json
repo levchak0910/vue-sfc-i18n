@@ -1,8 +1,28 @@
 {
   "name": "@vue-sfc-i18n/shared",
   "version": "0.0.3",
+  "description": "Shared parsing and utility primitives for the vue-sfc-i18n toolchain",
+  "keywords": [
+    "vue",
+    "vue3",
+    "i18n",
+    "sfc",
+    "internationalization"
+  ],
+  "author": "Sándor Levcsák",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/levchak0910/vue-sfc-i18n.git"
+  },
+  "homepage": "git+https://github.com/levchak0910/vue-sfc-i18n#readme",
+  "bugs": {
+    "url": "git+https://github.com/levchak0910/vue-sfc-i18n/issues"
+  },
   "publishConfig": {
-    "access": "public"
+    "access": "public",
+    "registry": "https://registry.npmjs.org/",
+    "provenance": true
   },
   "type": "module",
   "scripts": {
