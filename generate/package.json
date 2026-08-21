@@ -1,6 +1,6 @@
 {
   "name": "@vue-sfc-i18n/generate",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "publishConfig": {
     "access": "public"
   },
@@ -13,6 +13,9 @@
     ".": "./dist/index.js"
   },
   "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
   "dependencies": {
     "@vue-sfc-i18n/shared": "workspace:*"
   },
