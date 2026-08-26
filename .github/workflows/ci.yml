@@ -26,6 +26,7 @@ jobs:
       - run: pnpm -F @vue-sfc-i18n/composable test
       - run: pnpm -F @vue-sfc-i18n/shared build
       - run: pnpm -F @vue-sfc-i18n/generate test
+      - run: pnpm -F @vue-sfc-i18n/eslint-plugin test
 
   e2e:
     runs-on: ubuntu-latest

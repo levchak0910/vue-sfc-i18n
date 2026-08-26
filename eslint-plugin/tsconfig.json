@@ -11,5 +11,5 @@
     "types": ["node"]
   },
   "include": ["**/*.ts"],
-  "exclude": ["dist/**"]
+  "exclude": ["tests/**", "vitest.config.ts", "dist/**"]
 }
