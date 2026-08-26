@@ -1,10 +1,10 @@
-import rule from "../../rules/key-equals-value"
+import rule from "../../rules/key-equals-plain-value"
 import { tester } from "../utils/tester"
 
 const withI18n = (locale: string, content: string) =>
   `<template><div/></template>\n<i18n locale="${locale}">\n${content}\n</i18n>`
 
-tester.run("key-equals-value", rule, {
+tester.run("key-equals-plain-value", rule, {
   valid: [
     { filename: "test.vue", code: withI18n("en", "greeting: greeting") },
     { filename: "test.vue", code: withI18n("en", "greeting: Hello, {name}!") },

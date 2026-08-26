@@ -18,14 +18,14 @@ tester.run("no-missing-params", rule, {
       filename: "test.vue",
       code: sfc([
         { locale: "en", content: ["greeting: Hello, {name}!"] },
-        { locale: "hu", content: ["greeting: Helló, {name}!"] },
+        { locale: "hu", content: ["greeting: Szia, {name}!"] },
       ]),
     },
     {
       filename: "test.vue",
       code: sfc([
         { locale: "en", content: ["greeting: Hello"] },
-        { locale: "hu", content: ["greeting: Helló"] },
+        { locale: "hu", content: ["greeting: Szia"] },
       ]),
     },
     {
@@ -42,7 +42,7 @@ tester.run("no-missing-params", rule, {
       filename: "test.vue",
       code: sfc([
         { locale: "en", content: ["greeting: Hello, {name}!"] },
-        { locale: "hu", content: ["greeting: Helló!"] },
+        { locale: "hu", content: ["greeting: Szia!"] },
       ]),
       errors: [{
         messageId: "missingParam",
@@ -64,7 +64,7 @@ tester.run("no-missing-params", rule, {
       filename: "test.vue",
       code: sfc([
         { locale: "en", content: ["greeting: Hello, {name}!", "farewell: Goodbye"] },
-        { locale: "hu", content: ["greeting: Helló!", "farewell: Viszlát"] },
+        { locale: "hu", content: ["greeting: Szia!", "farewell: Viszlát"] },
       ]),
       errors: [{
         messageId: "missingParam",
@@ -75,7 +75,7 @@ tester.run("no-missing-params", rule, {
       filename: "test.vue",
       code: sfc([
         { locale: "en", content: ["greeting: Hello, {name}!"] },
-        { locale: "hu", content: ["greeting: Helló!"] },
+        { locale: "hu", content: ["greeting: Szia!"] },
         { locale: "fr", content: ["greeting: Bonjour!"] },
       ]),
       errors: [
@@ -93,7 +93,7 @@ tester.run("no-missing-params", rule, {
       filename: "test.vue",
       code: sfc([
         { locale: "en", content: ["greeting: Hello, {user-name}!"] },
-        { locale: "hu", content: ["greeting: Helló, {name}!"] },
+        { locale: "hu", content: ["greeting: Szia, {name}!"] },
       ]),
       errors: [
         {

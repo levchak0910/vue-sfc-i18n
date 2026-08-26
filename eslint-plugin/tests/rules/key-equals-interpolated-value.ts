@@ -14,7 +14,7 @@ tester.run("key-equals-interpolated-value", rule, {
     { filename: "test.ts", code: "const x = 1" },
     {
       filename: "test.vue",
-      code: withI18n("hu", ["Helló, NAME!: Helló, {name}!"]),
+      code: withI18n("hu", ["Szia, NAME!: Szia, {name}!"]),
       options: [{ locale: "hu" }],
     },
   ],

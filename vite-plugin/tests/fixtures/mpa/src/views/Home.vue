@@ -20,6 +20,6 @@ farewell: Goodbye
 </i18n>
 
 <i18n locale="hu">
-greeting: Helló, {name}!
+greeting: Szia, {name}!
 farewell: Viszlát
 </i18n>

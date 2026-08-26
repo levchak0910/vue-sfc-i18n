@@ -27,12 +27,12 @@ describe("extractTranslations", () => {
   it("extracts translations from multiple blocks with different locales", () => {
     const code = sfc([
       i18nBlock("en", ["greeting: Hello"]),
-      i18nBlock("hu", ["greeting: Helló"]),
+      i18nBlock("hu", ["greeting: Szia"]),
     ])
 
     expect(extractTranslations(code)).toEqual({
       en: { greeting: "Hello" },
-      hu: { greeting: "Helló" },
+      hu: { greeting: "Szia" },
     })
   })
 

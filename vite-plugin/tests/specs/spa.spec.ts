@@ -14,7 +14,7 @@ test.describe("Home: rendering", () => {
   test("renders Hungarian greeting and farewell when /hu entered", async ({ page }) => {
     await page.goto("/hu")
 
-    await expect(page.getByTestId("greeting")).toHaveText("Helló, World!")
+    await expect(page.getByTestId("greeting")).toHaveText("Szia, World!")
     await expect(page.getByTestId("farewell")).toHaveText("Viszlát")
   })
 
@@ -23,14 +23,14 @@ test.describe("Home: rendering", () => {
 
     await expect(page.getByTestId("greeting")).toHaveText("Hello, World!")
     await expect(page.getByTestId("farewell")).toHaveText("Goodbye")
-    await expect(page.getByTestId("greeting")).not.toHaveText("Helló, World!")
+    await expect(page.getByTestId("greeting")).not.toHaveText("Szia, World!")
     await expect(page.getByTestId("farewell")).not.toHaveText("Viszlát")
 
     await page.getByTestId("btn-hu").click()
 
     await expect(page.getByTestId("greeting")).not.toHaveText("Hello, World!")
     await expect(page.getByTestId("farewell")).not.toHaveText("Goodbye")
-    await expect(page.getByTestId("greeting")).toHaveText("Helló, World!")
+    await expect(page.getByTestId("greeting")).toHaveText("Szia, World!")
     await expect(page.getByTestId("farewell")).toHaveText("Viszlát")
   })
 })
@@ -46,7 +46,7 @@ test.describe("Home: interpolation", () => {
   test("substitutes {name} param in Hungarian greeting", async ({ page }) => {
     await page.goto("/hu")
 
-    await expect(page.getByTestId("greeting")).toHaveText("Helló, World!")
+    await expect(page.getByTestId("greeting")).toHaveText("Szia, World!")
     await expect(page.getByTestId("greeting")).not.toHaveText("{name}")
   })
 
@@ -55,7 +55,7 @@ test.describe("Home: interpolation", () => {
     await expect(page.getByTestId("greeting")).toHaveText("Hello, World!")
 
     await page.getByTestId("btn-hu").click()
-    await expect(page.getByTestId("greeting")).toHaveText("Helló, World!")
+    await expect(page.getByTestId("greeting")).toHaveText("Szia, World!")
     await expect(page.getByTestId("greeting")).not.toHaveText("{name}")
   })
 })
@@ -143,7 +143,7 @@ test.describe("chunk isolation @dev-only", () => {
     await page.goto("/hu")
     const translations = await getTranslations()
 
-    expect(translations).toHaveProperty("greeting", "Helló, {name}!")
+    expect(translations).toHaveProperty("greeting", "Szia, {name}!")
     expect(translations).toHaveProperty("farewell", "Viszlát")
     expect(translations).not.toHaveProperty("about-title")
     expect(translations).not.toHaveProperty("team")
@@ -310,7 +310,7 @@ test.describe("chunk isolation @prod-only", () => {
     await page.goto("/hu")
     const translations = await getTranslations()
 
-    expect(translations).toHaveProperty("greeting", "Helló, {name}!")
+    expect(translations).toHaveProperty("greeting", "Szia, {name}!")
     expect(translations).toHaveProperty("farewell", "Viszlát")
     expect(translations).not.toHaveProperty("about-title")
     expect(translations).not.toHaveProperty("team")

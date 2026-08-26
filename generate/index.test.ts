@@ -78,7 +78,7 @@ describe("generateKeys", () => {
   it("deduplicates keys appearing across multiple components and locales", async () => {
     await writeVue("Home.vue", sfc([
       i18nBlock("en", ["greeting: Hello"]),
-      i18nBlock("hu", ["greeting: Helló"]),
+      i18nBlock("hu", ["greeting: Szia"]),
     ]))
 
     await generateKeys(tmpDir, keysFile)
@@ -145,7 +145,7 @@ describe("generateKeys", () => {
   it("unions params from the same key across locales", async () => {
     await writeVue("Home.vue", sfc([
       i18nBlock("en", ["msg: Hello, {name}!"]),
-      i18nBlock("hu", ["msg: Helló, {name}!"]),
+      i18nBlock("hu", ["msg: Szia, {name}!"]),
     ]))
 
     await generateKeys(tmpDir, keysFile)
