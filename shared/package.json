@@ -27,7 +27,8 @@
   "type": "module",
   "scripts": {
     "build": "tsc --noEmit false --declaration true --outDir dist",
-    "type-check": "tsc --noEmit"
+    "type-check": "tsc --noEmit",
+    "test": "vitest run"
   },
   "exports": {
     ".": "./dist/index.js"
@@ -42,6 +43,7 @@
   },
   "devDependencies": {
     "@types/node": "^24.12.2",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "vitest": "^4.1.11"
   }
 }

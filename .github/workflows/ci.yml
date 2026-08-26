@@ -16,3 +16,24 @@ jobs:
       - run: pnpm -F @vue-sfc-i18n/generate type-check
       - run: pnpm -F @vue-sfc-i18n/generate build
       - run: pnpm -r type-check
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: ./.github/actions/install
+      - run: pnpm -F @vue-sfc-i18n/shared test
+      - run: pnpm -F @vue-sfc-i18n/composable test
+      - run: pnpm -F @vue-sfc-i18n/shared build
+      - run: pnpm -F @vue-sfc-i18n/generate test
+
+  e2e:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: ./.github/actions/install
+      - run: pnpm -F @vue-sfc-i18n/shared build
+      - run: pnpm -F @vue-sfc-i18n/generate build
+      - run: pnpm -F @vue-sfc-i18n/composable build
+      - run: pnpm -F @vue-sfc-i18n/vite-plugin install:deps
+      - run: pnpm -F @vue-sfc-i18n/vite-plugin test:e2e

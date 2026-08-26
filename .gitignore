@@ -1,2 +1,4 @@
 node_modules
 dist
+vite-plugin/test-results
+**/i18n-keys.d.ts

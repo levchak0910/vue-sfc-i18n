@@ -29,7 +29,17 @@
   "type": "module",
   "scripts": {
     "build": "tsc --noEmit false --declaration true --outDir dist",
-    "type-check": "tsc --noEmit"
+    "type-check": "tsc --noEmit",
+    "install:deps": "playwright install --with-deps chromium",
+    "spa:dev": "vite tests/fixtures/spa --port 5170",
+    "spa:build": "vite build tests/fixtures/spa",
+    "spa:prod": "pnpm spa:build && NODE_ENV=production vite preview tests/fixtures/spa --port 5171",
+    "mpa:dev": "PORT=5180 node tests/fixtures/mpa/server/index.js",
+    "mpa:build:client": "vite build tests/fixtures/mpa --outDir dist/client",
+    "mpa:build:server": "vite build tests/fixtures/mpa --ssr src/entry-server.ts --outDir dist/server",
+    "mpa:build": "pnpm mpa:build:client && pnpm mpa:build:server",
+    "mpa:prod": "pnpm mpa:build && PORT=5181 NODE_ENV=production node tests/fixtures/mpa/server/index.js",
+    "test:e2e": "playwright test"
   },
   "exports": {
     ".": "./dist/index.js"
@@ -44,9 +54,13 @@
     "picomatch": "^4.0.5"
   },
   "devDependencies": {
+    "@vue-sfc-i18n/composable": "workspace:*",
+    "@playwright/test": "^1.62.1",
     "@types/node": "^24.12.2",
     "@types/picomatch": "^4.0.3",
+    "@vitejs/plugin-vue": "^6.0.8",
     "typescript": "^5.9.3",
-    "vite": "^8.0.0"
+    "vite": "^8.0.0",
+    "vue": "^3.5.41"
   }
 }
