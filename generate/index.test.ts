@@ -123,4 +123,65 @@ describe("generateKeys", () => {
       + "export {}\n",
     )
   })
+
+  it("emits a param object type for a key with one placeholder", async () => {
+    await writeVue("Home.vue", sfc([i18nBlock("en", ["greeting: Hello, {name}!"])]))
+
+    await generateKeys(tmpDir, keysFile)
+    const content = await fs.readFile(keysFile, "utf-8")
+
+    expect(content).toContain('"greeting": { name: string | number }')
+  })
+
+  it("emits param object types for a key with multiple placeholders", async () => {
+    await writeVue("Home.vue", sfc([i18nBlock("en", ["msg: \"'{a}' and '{b}'\""])]))
+
+    await generateKeys(tmpDir, keysFile)
+    const content = await fs.readFile(keysFile, "utf-8")
+
+    expect(content).toContain('"msg": { a: string | number; b: string | number }')
+  })
+
+  it("unions params from the same key across locales", async () => {
+    await writeVue("Home.vue", sfc([
+      i18nBlock("en", ["msg: Hello, {name}!"]),
+      i18nBlock("hu", ["msg: Helló, {name}!"]),
+    ]))
+
+    await generateKeys(tmpDir, keysFile)
+    const content = await fs.readFile(keysFile, "utf-8")
+    const count = content.match(/"msg":/g) ?? []
+
+    expect(content).toContain('"msg": { name: string | number }')
+    expect(count).toHaveLength(1)
+  })
+
+  it("collects params from the same key across files", async () => {
+    await writeVue("A.vue", sfc([i18nBlock("en", ["msg: Hi, {name}!"])]))
+    await writeVue("B.vue", sfc([i18nBlock("en", ["msg: Hey, {name}!"])]))
+
+    await generateKeys(tmpDir, keysFile)
+    const content = await fs.readFile(keysFile, "utf-8")
+    const count = content.match(/"msg":/g) ?? []
+
+    expect(content).toContain('"msg": { name: string | number }')
+    expect(count).toHaveLength(1)
+  })
+
+  it("produces exact output for a key with placeholders", async () => {
+    await writeVue("Home.vue", sfc([i18nBlock("en", ["greeting: Hello, {name}!"])]))
+
+    await generateKeys(tmpDir, keysFile)
+    const content = await fs.readFile(keysFile, "utf-8")
+
+    expect(content).toBe(
+      'declare module "@vue-sfc-i18n/composable" {\n'
+      + "  interface I18nSchema {\n"
+      + '    "greeting": { name: string | number }\n'
+      + "  }\n"
+      + "}\n"
+      + "\n"
+      + "export {}\n",
+    )
+  })
 })

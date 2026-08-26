@@ -2,6 +2,28 @@ import { readFile, writeFile } from "node:fs/promises"
 
 import { extractTranslations, walkVueFiles } from "@vue-sfc-i18n/shared"
 
+const PLACEHOLDER_RE = /\{(\w+)\}/g
+
+function extractParams (value: string): string[] {
+  const result: string[] = []
+  let m: RegExpExecArray | null
+  PLACEHOLDER_RE.lastIndex = 0
+
+  while ((m = PLACEHOLDER_RE.exec(value)) !== null)
+    result.push(m[1])
+
+  return result
+}
+
+function keyEntry (key: string, params: Set<string>): string {
+  if (params.size === 0)
+    return `    ${JSON.stringify(key)}: string`
+
+  const inner = [ ...params ].map(p => `${p}: string | number`).join("; ")
+
+  return `    ${JSON.stringify(key)}: { ${inner} }`
+}
+
 /**
  * Generate an `I18nSchema` module augmentation from all `<i18n>` blocks in `.vue` files.
  *
@@ -10,7 +32,7 @@ import { extractTranslations, walkVueFiles } from "@vue-sfc-i18n/shared"
  */
 export async function generateKeys (srcDir: string, keysFile: string): Promise<void> {
   const files = await walkVueFiles(srcDir)
-  const allKeys = new Set<string>()
+  const allKeys = new Map<string, Set<string>>()
 
   await Promise.all(
     files.map(async file => {
@@ -18,8 +40,12 @@ export async function generateKeys (srcDir: string, keysFile: string): Promise<v
       const translations = extractTranslations(code)
 
       Object.values(translations).forEach(keys => {
-        Object.keys(keys).forEach(key => {
-          allKeys.add(key)
+        Object.entries(keys).forEach(([ key, value ]) => {
+          if (!allKeys.has(key))
+            allKeys.set(key, new Set())
+          
+          for (const p of extractParams(value))
+            allKeys.get(key)!.add(p)
         })
       })
     }),
@@ -28,7 +54,7 @@ export async function generateKeys (srcDir: string, keysFile: string): Promise<v
   const content = [
     `declare module "@vue-sfc-i18n/composable" {`,
     "  interface I18nSchema {",
-    [ ...allKeys ].map(k => `    ${JSON.stringify(k)}: string`).join("\n"),
+    [ ...allKeys.entries() ].map(([ k, params ]) => keyEntry(k, params)).join("\n"),
     "  }",
     "}",
     "",

@@ -30,9 +30,6 @@ importers:
 
   eslint-plugin:
     dependencies:
-      '@vue-sfc-i18n/shared':
-        specifier: workspace:*
-        version: link:../shared
       eslint:
         specifier: ^10.3.0
         version: 10.8.1(jiti@2.7.0)

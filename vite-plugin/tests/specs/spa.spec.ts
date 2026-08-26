@@ -7,31 +7,56 @@ test.describe("Home: rendering", () => {
   test("renders English greeting and farewell when /en entered", async ({ page }) => {
     await page.goto("/en")
 
-    await expect(page.getByTestId("greeting")).toHaveText("Hello World")
+    await expect(page.getByTestId("greeting")).toHaveText("Hello, World!")
     await expect(page.getByTestId("farewell")).toHaveText("Goodbye")
   })
 
   test("renders Hungarian greeting and farewell when /hu entered", async ({ page }) => {
     await page.goto("/hu")
 
-    await expect(page.getByTestId("greeting")).toHaveText("Helló Világ")
+    await expect(page.getByTestId("greeting")).toHaveText("Helló, World!")
     await expect(page.getByTestId("farewell")).toHaveText("Viszlát")
   })
 
   test("switches to Hungarian", async ({ page }) => {
     await page.goto("/en")
 
-    await expect(page.getByTestId("greeting")).toHaveText("Hello World")
+    await expect(page.getByTestId("greeting")).toHaveText("Hello, World!")
     await expect(page.getByTestId("farewell")).toHaveText("Goodbye")
-    await expect(page.getByTestId("greeting")).not.toHaveText("Helló Világ")
+    await expect(page.getByTestId("greeting")).not.toHaveText("Helló, World!")
     await expect(page.getByTestId("farewell")).not.toHaveText("Viszlát")
 
     await page.getByTestId("btn-hu").click()
 
-    await expect(page.getByTestId("greeting")).not.toHaveText("Hello World")
+    await expect(page.getByTestId("greeting")).not.toHaveText("Hello, World!")
     await expect(page.getByTestId("farewell")).not.toHaveText("Goodbye")
-    await expect(page.getByTestId("greeting")).toHaveText("Helló Világ")
+    await expect(page.getByTestId("greeting")).toHaveText("Helló, World!")
     await expect(page.getByTestId("farewell")).toHaveText("Viszlát")
+  })
+})
+
+test.describe("Home: interpolation", () => {
+  test("substitutes {name} param in English greeting", async ({ page }) => {
+    await page.goto("/en")
+
+    await expect(page.getByTestId("greeting")).toHaveText("Hello, World!")
+    await expect(page.getByTestId("greeting")).not.toHaveText("{name}")
+  })
+
+  test("substitutes {name} param in Hungarian greeting", async ({ page }) => {
+    await page.goto("/hu")
+
+    await expect(page.getByTestId("greeting")).toHaveText("Helló, World!")
+    await expect(page.getByTestId("greeting")).not.toHaveText("{name}")
+  })
+
+  test("substituted param persists after language switch", async ({ page }) => {
+    await page.goto("/en")
+    await expect(page.getByTestId("greeting")).toHaveText("Hello, World!")
+
+    await page.getByTestId("btn-hu").click()
+    await expect(page.getByTestId("greeting")).toHaveText("Helló, World!")
+    await expect(page.getByTestId("greeting")).not.toHaveText("{name}")
   })
 })
 
@@ -105,7 +130,7 @@ test.describe("chunk isolation @dev-only", () => {
     await page.goto("/en")
     const translations = await getTranslations()
 
-    expect(translations).toHaveProperty("greeting", "Hello World")
+    expect(translations).toHaveProperty("greeting", "Hello, {name}!")
     expect(translations).toHaveProperty("farewell", "Goodbye")
     expect(translations).not.toHaveProperty("about-title")
     expect(translations).not.toHaveProperty("team")
@@ -118,7 +143,7 @@ test.describe("chunk isolation @dev-only", () => {
     await page.goto("/hu")
     const translations = await getTranslations()
 
-    expect(translations).toHaveProperty("greeting", "Helló Világ")
+    expect(translations).toHaveProperty("greeting", "Helló, {name}!")
     expect(translations).toHaveProperty("farewell", "Viszlát")
     expect(translations).not.toHaveProperty("about-title")
     expect(translations).not.toHaveProperty("team")
@@ -272,7 +297,7 @@ test.describe("chunk isolation @prod-only", () => {
     await page.goto("/en")
     const translations = await getTranslations()
 
-    expect(translations).toHaveProperty("greeting", "Hello World")
+    expect(translations).toHaveProperty("greeting", "Hello, {name}!")
     expect(translations).toHaveProperty("farewell", "Goodbye")
     expect(translations).not.toHaveProperty("about-title")
     expect(translations).not.toHaveProperty("team")
@@ -285,7 +310,7 @@ test.describe("chunk isolation @prod-only", () => {
     await page.goto("/hu")
     const translations = await getTranslations()
 
-    expect(translations).toHaveProperty("greeting", "Helló Világ")
+    expect(translations).toHaveProperty("greeting", "Helló, {name}!")
     expect(translations).toHaveProperty("farewell", "Viszlát")
     expect(translations).not.toHaveProperty("about-title")
     expect(translations).not.toHaveProperty("team")

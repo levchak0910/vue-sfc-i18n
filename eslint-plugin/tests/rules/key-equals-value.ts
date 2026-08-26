@@ -7,6 +7,7 @@ const withI18n = (locale: string, content: string) =>
 tester.run("key-equals-value", rule, {
   valid: [
     { filename: "test.vue", code: withI18n("en", "greeting: greeting") },
+    { filename: "test.vue", code: withI18n("en", "greeting: Hello, {name}!") },
     { filename: "test.vue", code: `<template><div/></template>` },
     {
       filename: "test.vue",

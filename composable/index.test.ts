@@ -18,22 +18,50 @@ describe("useI18n", () => {
     expect(typeof t).toBe("function")
   })
 
-  it("t falls back to the key when no translation exists", () => {
-    const { t } = useI18n()
-    expect(t("missing.key")).toBe("missing.key")
+  describe("plain", () => {
+    it("falls back to the key when no translation exists", () => {
+      const { t } = useI18n()
+      expect(t("missing.key")).toBe("missing.key")
+    })
+
+    it("returns the translated string after mergeTranslations", () => {
+      manager.mergeTranslations({ greeting: "Hello" })
+      const { t } = useI18n()
+      expect(t("greeting")).toBe("Hello")
+    })
+
+    it("reflects translations loaded via loadTranslations", async () => {
+      manager.registerEntryLoader(() => Promise.resolve({ hello: "world" }))
+      await manager.loadTranslations("en")
+      const { t } = useI18n()
+      expect(t("hello")).toBe("world")
+    })
   })
 
-  it("t returns the translated string after mergeTranslations", () => {
-    manager.mergeTranslations({ greeting: "Hello" })
-    const { t } = useI18n()
-    expect(t("greeting")).toBe("Hello")
-  })
+  describe("interpolation", () => {
+    it("substitutes a single param", () => {
+      manager.mergeTranslations({ greeting: "Hello, {name}!" })
+      const { t } = useI18n()
+      expect(t("greeting", { name: "World" })).toBe("Hello, World!")
+    })
 
-  it("t reflects translations loaded via loadTranslations", async () => {
-    manager.registerEntryLoader(() => Promise.resolve({ hello: "world" }))
-    await manager.loadTranslations("en")
-    const { t } = useI18n()
-    expect(t("hello")).toBe("world")
+    it("substitutes multiple params", () => {
+      manager.mergeTranslations({ msg: "{a} and {b}" })
+      const { t } = useI18n()
+      expect(t("msg", { a: "foo", b: "bar" })).toBe("foo and bar")
+    })
+
+    it("substitutes params with surrounding spaces", () => {
+      manager.mergeTranslations({ greeting: "Hello, { name }!" })
+      const { t } = useI18n()
+      expect(t("greeting", { name: "World" })).toBe("Hello, World!")
+    })
+
+    it("leaves unknown placeholders intact", () => {
+      manager.mergeTranslations({ msg: "Hello, {name}!" })
+      const { t } = useI18n()
+      expect(t("msg", {})).toBe("Hello, {name}!")
+    })
   })
 })
 

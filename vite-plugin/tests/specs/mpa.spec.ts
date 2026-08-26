@@ -7,7 +7,7 @@ test.describe("server-side routing", () => {
   test("/en renders Home content in the initial HTML", async ({ page }) => {
     const response = await page.request.get("/en")
     const html = await response.text()
-    expect(html).toContain("Hello World")
+    expect(html).toContain("Hello, World!")
     expect(html).toContain("Goodbye")
     expect(html).not.toContain("About Us")
     expect(html).not.toContain("Our Team")
@@ -18,7 +18,7 @@ test.describe("server-side routing", () => {
   test("/hu renders Hungarian Home content in the initial HTML", async ({ page }) => {
     const response = await page.request.get("/hu")
     const html = await response.text()
-    expect(html).toContain("Helló Világ")
+    expect(html).toContain("Helló, World!")
     expect(html).toContain("Viszlát")
     expect(html).not.toContain("Rólunk")
     expect(html).not.toContain("Csapatunk")
@@ -31,7 +31,7 @@ test.describe("server-side routing", () => {
     const html = await response.text()
     expect(html).toContain("About Us")
     expect(html).toContain("Our Team")
-    expect(html).not.toContain("Hello World")
+    expect(html).not.toContain("Hello, World!")
     expect(html).not.toContain("Goodbye")
     expect(html).not.toContain("Contact Us")
     expect(html).not.toContain("Email us at hello@example.com")
@@ -42,7 +42,7 @@ test.describe("server-side routing", () => {
     const html = await response.text()
     expect(html).toContain("Rólunk")
     expect(html).toContain("Csapatunk")
-    expect(html).not.toContain("Helló Világ")
+    expect(html).not.toContain("Helló, World!")
     expect(html).not.toContain("Viszlát")
     expect(html).not.toContain("Kapcsolat")
     expect(html).not.toContain("Írjon nekünk")
@@ -53,7 +53,7 @@ test.describe("server-side routing", () => {
     const html = await response.text()
     expect(html).toContain("Contact Us")
     expect(html).toContain("Email us at hello@example.com")
-    expect(html).not.toContain("Hello World")
+    expect(html).not.toContain("Hello, World!")
     expect(html).not.toContain("Goodbye")
     expect(html).not.toContain("About Us")
     expect(html).not.toContain("Our Team")
@@ -64,7 +64,7 @@ test.describe("server-side routing", () => {
     const html = await response.text()
     expect(html).toContain("Kapcsolat")
     expect(html).toContain("Írjon nekünk a e-mail cimre hello@example.com")
-    expect(html).not.toContain("Helló Világ")
+    expect(html).not.toContain("Helló, World!")
     expect(html).not.toContain("Viszlát")
     expect(html).not.toContain("Rólunk")
     expect(html).not.toContain("Csapatunk")
@@ -75,14 +75,14 @@ test.describe("Home: rendering", () => {
   test("renders English translations after hydration", async ({ page }) => {
     await page.goto("/en")
 
-    await expect(page.getByTestId("greeting")).toHaveText("Hello World")
+    await expect(page.getByTestId("greeting")).toHaveText("Hello, World!")
     await expect(page.getByTestId("farewell")).toHaveText("Goodbye")
   })
 
   test("renders Hungarian when navigating directly to /hu", async ({ page }) => {
     await page.goto("/hu")
 
-    await expect(page.getByTestId("greeting")).toHaveText("Helló Világ")
+    await expect(page.getByTestId("greeting")).toHaveText("Helló, World!")
     await expect(page.getByTestId("farewell")).toHaveText("Viszlát")
   })
 
@@ -90,8 +90,32 @@ test.describe("Home: rendering", () => {
     await page.goto("/en")
     await page.getByTestId("btn-hu").click()
 
-    await expect(page.getByTestId("greeting")).toHaveText("Helló Világ")
+    await expect(page.getByTestId("greeting")).toHaveText("Helló, World!")
     await expect(page.getByTestId("farewell")).toHaveText("Viszlát")
+  })
+})
+
+test.describe("Home: interpolation", () => {
+  test("substitutes {name} param in English greeting", async ({ page }) => {
+    await page.goto("/en")
+
+    await expect(page.getByTestId("greeting")).toHaveText("Hello, World!")
+    await expect(page.getByTestId("greeting")).not.toHaveText("{name}")
+  })
+
+  test("substitutes {name} param in Hungarian greeting", async ({ page }) => {
+    await page.goto("/hu")
+
+    await expect(page.getByTestId("greeting")).toHaveText("Helló, World!")
+    await expect(page.getByTestId("greeting")).not.toHaveText("{name}")
+  })
+
+  test("substituted param is present in SSR HTML", async ({ page }) => {
+    const response = await page.request.get("/en")
+    const html = await response.text()
+
+    expect(html).toContain("Hello, World!")
+    expect(html).not.toContain("{name}")
   })
 })
 
@@ -149,7 +173,7 @@ test.describe("chunk isolation @dev-only", () => {
     await page.goto("/en")
     const translations = await getTranslations()
 
-    expect(translations).toHaveProperty("greeting", "Hello World")
+    expect(translations).toHaveProperty("greeting", "Hello, {name}!")
     expect(translations).toHaveProperty("farewell", "Goodbye")
     expect(translations).not.toHaveProperty("about-title")
     expect(translations).not.toHaveProperty("team")
@@ -162,7 +186,7 @@ test.describe("chunk isolation @dev-only", () => {
     await page.goto("/hu")
     const translations = await getTranslations()
 
-    expect(translations).toHaveProperty("greeting", "Helló Világ")
+    expect(translations).toHaveProperty("greeting", "Helló, {name}!")
     expect(translations).toHaveProperty("farewell", "Viszlát")
     expect(translations).not.toHaveProperty("about-title")
     expect(translations).not.toHaveProperty("team")
@@ -314,7 +338,7 @@ test.describe("chunk isolation @prod-only", () => {
     await page.goto("/en")
     const translations = await getTranslations()
 
-    expect(translations).toHaveProperty("greeting", "Hello World")
+    expect(translations).toHaveProperty("greeting", "Hello, {name}!")
     expect(translations).toHaveProperty("farewell", "Goodbye")
     expect(translations).not.toHaveProperty("about-title")
     expect(translations).not.toHaveProperty("team")
@@ -327,7 +351,7 @@ test.describe("chunk isolation @prod-only", () => {
     await page.goto("/hu")
     const translations = await getTranslations()
 
-    expect(translations).toHaveProperty("greeting", "Helló Világ")
+    expect(translations).toHaveProperty("greeting", "Helló, {name}!")
     expect(translations).toHaveProperty("farewell", "Viszlát")
     expect(translations).not.toHaveProperty("about-title")
     expect(translations).not.toHaveProperty("team")

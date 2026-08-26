@@ -1,11 +1,7 @@
 import type { Rule } from "eslint"
-import type { AST } from "vue-eslint-parser"
 
 import { getI18N, getScripts, getTemplate } from "../utils/get-block.js"
-
-type VueParserServices = {
-  getDocumentFragment: () => null | AST.VDocumentFragment
-}
+import { getDocumentFragment } from "../utils/get-document-fragment.js"
 
 function extractKeyOrder (templateSource: string, scriptSource: string): string[] {
   const keys: string[] = []
@@ -88,11 +84,7 @@ const rule: Rule.RuleModule = {
         if (!context.filename.endsWith(".vue"))
           return
 
-        // vue-eslint-parser exposes the SFC structure through parserServices;
-        // getDocumentFragment() gives us all top-level blocks (template, script, i18n…)
-        // with exact source ranges, eliminating the need for regex-based block detection
-        const services = context.sourceCode.parserServices as VueParserServices
-        const df = services.getDocumentFragment()
+        const df = getDocumentFragment(context)
         if (df === null)
           return
 

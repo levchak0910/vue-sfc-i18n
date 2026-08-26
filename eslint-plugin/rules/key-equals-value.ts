@@ -1,5 +1,8 @@
 import type { Rule } from "eslint"
-import { extractTranslations } from "@vue-sfc-i18n/shared"
+
+import { getI18N } from "../utils/get-block.js"
+import { getDocumentFragment } from "../utils/get-document-fragment.js"
+import { forEachKeyValue } from "../utils/get-language-block-content.js"
 
 const rule: Rule.RuleModule = {
   meta: {
@@ -27,42 +30,36 @@ const rule: Rule.RuleModule = {
         if (!context.filename.endsWith(".vue"))
           return
 
-        const code = context.sourceCode.getText()
-        const translations = extractTranslations(code)[language]
-
-        // eslint-disable-next-line ts/no-unnecessary-condition -- <i18n> is not used in some .vue files
-        if (translations === undefined)
+        const df = getDocumentFragment(context)
+        if (df === null)
           return
 
-        const lines = code.split("\n")
+        const src = context.sourceCode.getText()
+        const i18nBlocks = getI18N(context, df).filter(b => b.language === language)
 
-        for (const [ key, value ] of Object.entries(translations)) {
-          if (key === value)
-            continue
+        for (const block of i18nBlocks) {
+          forEachKeyValue(src, block.contentRange, ({ key, value, valueParams, keyLoc }) => {
+            if (valueParams.length > 0 || key === value)
+              return
 
-          const lineIdx = lines.findIndex(l => l.trimStart().startsWith(`${key}:`))
-          if (lineIdx === -1)
-            continue
-
-          const rawLine = lines[lineIdx]
-          const startColumn = Math.max(0, rawLine.indexOf(key))
-          const endColumn = startColumn + key.length
-          const lineOffset = lines.slice(0, lineIdx).reduce((acc, l) => acc + l.length + 1, 0)
-
-          context.report({
-            loc: {
-              start: { line: lineIdx + 1, column: startColumn },
-              end: { line: lineIdx + 1, column: endColumn },
-            },
-            messageId: "mismatch",
-            data: { key, value, language },
-            suggest: [
-              {
-                messageId: "replaceWithValue",
-                data: { value },
-                fix: fixer => fixer.replaceTextRange([ lineOffset + startColumn, lineOffset + endColumn ], value),
-              },
-            ],
+            context.report({
+              loc: keyLoc,
+              messageId: "mismatch",
+              data: { key, value, language },
+              suggest: [
+                {
+                  messageId: "replaceWithValue",
+                  data: { value },
+                  fix: fixer => fixer.replaceTextRange(
+                    [
+                      context.sourceCode.getIndexFromLoc(keyLoc.start),
+                      context.sourceCode.getIndexFromLoc(keyLoc.end),
+                    ],
+                    value,
+                  ),
+                },
+              ],
+            })
           })
         }
       },

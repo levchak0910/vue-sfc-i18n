@@ -4,6 +4,12 @@ import { ref } from "vue"
 export interface I18nSchema {}
 
 type TranslationKey = keyof I18nSchema extends never ? string : keyof I18nSchema
+type ParamsArg<K extends TranslationKey> =
+  K extends keyof I18nSchema
+    ? I18nSchema[K] extends string
+      ? []
+      : [params: I18nSchema[K]]
+    : [params?: Record<string, string | number>]
 
 const translations = ref<Record<string, string>>({})
 const language = ref<null | string>(null)
@@ -11,9 +17,16 @@ const language = ref<null | string>(null)
 type EntryLoader = () => Promise<Record<string, string>>
 const entryLoaders: EntryLoader[] = []
 
-const t = (key: TranslationKey): string => translations.value[key] ?? key
+const interpolate = (str: string, params: Record<string, string | number>): string =>
+  str.replace(/\{\s*(\w+)\s*\}/g, (_, k: string) => String(params[k] ?? `{${k}}`))
 
-export const useI18n = (): { t: (key: TranslationKey) => string } => ({ t })
+const t = <K extends TranslationKey>(key: K, ...args: ParamsArg<K>): string => {
+  const value = translations.value[key] ?? key
+  const params = args[0]
+  return params ? interpolate(value, params) : value
+}
+
+export const useI18n = () => ({ t })
 
 export const manager = {
   /** @private */

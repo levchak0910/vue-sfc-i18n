@@ -40,7 +40,6 @@
     "dist"
   ],
   "dependencies": {
-    "@vue-sfc-i18n/shared": "workspace:*",
     "eslint": "^10.3.0"
   },
   "devDependencies": {
