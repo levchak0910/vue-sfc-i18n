@@ -1,6 +1,6 @@
 import { defineConfig } from "vite"
 import vue from "@vitejs/plugin-vue"
-import { i18nPlugin } from "../../../index"
+import { i18nPlugin } from "../../../index.ts"
 
 export default defineConfig({
   plugins: [

@@ -1,7 +1,7 @@
 import { fileURLToPath } from "node:url"
 import { defineConfig } from "vite"
 import vue from "@vitejs/plugin-vue"
-import { i18nPlugin } from "../../../index"
+import { i18nPlugin } from "../../../index.ts"
 
 const srcDir = fileURLToPath(new URL("./src", import.meta.url))
 
