@@ -40,9 +40,11 @@
     "dist"
   ],
   "dependencies": {
-    "eslint": "^10.3.0"
+    "eslint": "^10.3.0",
+    "esquery": "^1.7.0"
   },
   "devDependencies": {
+    "@types/esquery": "^1.5.4",
     "@types/node": "^24.12.2",
     "typescript": "^5.9.3",
     "vitest": "^4.1.11",

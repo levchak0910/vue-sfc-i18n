@@ -1,7 +1,7 @@
 import type { Rule } from "eslint"
 
 import { getI18N } from "../utils/get-block.js"
-import { getDocumentFragment } from "../utils/get-document-fragment.js"
+import { getDocumentFragment } from "../utils/parser-services.js"
 import { forEachKeyValue } from "../utils/get-language-block-content.js"
 
 const toConstantCase = (name: string): string =>

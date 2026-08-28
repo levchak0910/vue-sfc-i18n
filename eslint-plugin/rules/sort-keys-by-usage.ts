@@ -1,7 +1,7 @@
 import type { Rule } from "eslint"
 
 import { getI18N, getScripts, getTemplate } from "../utils/get-block.js"
-import { getDocumentFragment } from "../utils/get-document-fragment.js"
+import { getDocumentFragment } from "../utils/parser-services.js"
 
 function extractKeyOrder (templateSource: string, scriptSource: string): string[] {
   const keys: string[] = []

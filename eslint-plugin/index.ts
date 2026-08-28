@@ -5,6 +5,7 @@ import keyEqualsInterpolatedValue from "./rules/key-equals-interpolated-value.js
 import noMissingParams from "./rules/no-missing-params.js"
 import sortKeysByUsage from "./rules/sort-keys-by-usage.js"
 import validParams from "./rules/valid-params.js"
+import noRawText from "./rules/no-raw-text.js"
 
 const plugin: ESLint.Plugin = {
   rules: {
@@ -13,6 +14,7 @@ const plugin: ESLint.Plugin = {
     "no-missing-params": noMissingParams,
     "sort-keys-by-usage": sortKeysByUsage,
     "valid-params": validParams,
+    "no-raw-text": noRawText,
   },
 }
 
