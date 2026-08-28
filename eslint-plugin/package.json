@@ -1,6 +1,6 @@
 {
   "name": "@vue-sfc-i18n/eslint-plugin",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "ESLint plugin for enforcing i18n conventions in Vue SFC custom blocks",
   "keywords": [
     "vue",

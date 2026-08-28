@@ -1,6 +1,6 @@
 {
   "name": "@vue-sfc-i18n/shared",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "Shared parsing and utility primitives for the vue-sfc-i18n toolchain",
   "keywords": [
     "vue",

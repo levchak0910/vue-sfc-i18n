@@ -1,6 +1,6 @@
 {
   "name": "@vue-sfc-i18n/generate",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "Code generation utilities for vue-sfc-i18n type-safe translation files",
   "keywords": [
     "vue",
