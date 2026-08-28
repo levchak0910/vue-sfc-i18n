@@ -61,10 +61,42 @@ tester.run("no-raw-text", rule, {
       code: script("const s = 'ignored text'"),
       options: [{ checkJS: true, ignoreText: ["ignored text"] }],
     },
-    // import sources excluded
+    // import sources excluded (static and dynamic)
     {
       filename: "test.vue",
       code: script("import foo from 'some module'"),
+      options: [{ checkJS: true }],
+    },
+    {
+      filename: "test.vue",
+      code: script("const m = import('some module')"),
+      options: [{ checkJS: true }],
+    },
+    // querySelector calls excluded
+    {
+      filename: "test.vue",
+      code: script("document.querySelector('.item:nth-child(2) raw text')"),
+      options: [{ checkJS: true }],
+    },
+    {
+      filename: "test.vue",
+      code: script("el.querySelector('input[type=\"raw text\"]')"),
+      options: [{ checkJS: true }],
+    },
+    // new Error / error subclasses excluded
+    {
+      filename: "test.vue",
+      code: script("throw new Error('raw error message')"),
+      options: [{ checkJS: true }],
+    },
+    {
+      filename: "test.vue",
+      code: script("throw new TypeError('raw type message')"),
+      options: [{ checkJS: true }],
+    },
+    {
+      filename: "test.vue",
+      code: script("throw new CustomError('raw custom error')"),
       options: [{ checkJS: true }],
     },
     // ignoreNodes
@@ -97,6 +129,9 @@ tester.run("no-raw-text", rule, {
       code: sfc("<p>raw text</p>"),
       options: [{ ignorePattern: ["^raw"] }],
     },
+    // id attribute (default ignored)
+    { filename: "test.vue", code: sfc("<p id=\"raw text\" />") },
+    { filename: "test.vue", code: sfc("<p :id=\"'raw text'\" />") },
     // VLiteral (static attributes)
     { filename: "test.vue", code: sfc("<p style=\"color: red\" />") },
     { filename: "test.vue", code: sfc("<p class=\"my-class other-class\" />") },
@@ -115,6 +150,10 @@ tester.run("no-raw-text", rule, {
       code: sfc("<p title=\"ignored text\" />"),
       options: [{ ignorePattern: ["^ignored"] }],
     },
+    // svg elements excluded
+    { filename: "test.vue", code: sfc("<svg><text>Raw label</text></svg>") },
+    { filename: "test.vue", code: sfc("<svg><g><text>Nested raw text</text></g></svg>") },
+    { filename: "test.vue", code: sfc("<svg><path :d=\"'M 0 0 raw path'\" /></svg>") },
     // comment directives — ignoreText
     {
       filename: "test.vue",
@@ -227,6 +266,20 @@ tester.run("no-raw-text", rule, {
       filename: "test.vue",
       code: sfc("<p>raw text</p>"),
       errors: [{ messageId: "rawText", data: { text: "raw text" } }],
+    },
+    // new SomeHelper — not Error-like, still reported
+    {
+      filename: "test.vue",
+      code: script("throw new Helper('raw helper message')"),
+      options: [{ checkJS: true }],
+      errors: [{ messageId: "rawText", data: { text: "raw helper message" } }],
+    },
+    // getElementById — not querySelector, still reported
+    {
+      filename: "test.vue",
+      code: script("document.getElementById('raw id selector')"),
+      options: [{ checkJS: true }],
+      errors: [{ messageId: "rawText", data: { text: "raw id selector" } }],
     },
     // VLiteral (static attributes)
     {

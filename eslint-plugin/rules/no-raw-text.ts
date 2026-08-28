@@ -15,14 +15,6 @@ const isIdentifierLike = (value: string) =>
   /^[A-Z][a-z0-9]*([A-Z][a-zA-Z0-9]*)+$/.test(value) ||    // PascalCase (2+ words)
   /^[A-Z][A-Z0-9]*(_+[A-Z0-9]+)+$/.test(value)             // SCREAMING_SNAKE_CASE
 
-function isTranslationCall (node: Rule.Node): boolean {
-  const p = node.parent
-  return p?.type === "CallExpression" && p.callee.type === "Identifier" && p.callee.name === "t"
-}
-
-function isImportSource (node: Rule.Node): boolean {
-  return node.parent?.type === "ImportDeclaration"
-}
 
 function isRawText (value: string, ignorePattern: RegExp[], ignoreText: string[]): boolean {
   const trimmed = value.trim()
@@ -73,12 +65,19 @@ const rule: Rule.RuleModule = {
     const optionIgnoreText: string[] = context.options[0]?.ignoreText ?? []
     const optionIgnoreNodes: string[] = [
       ...[
+        "id",
         "style",
         "class",
         "key",
         "data-allow-mismatch",
       ].flatMap(attr => [`VAttribute[key.rawName='${attr}']`, `VAttribute[key.argument.rawName='${attr}']`]),
+      "VElement[name='svg']",
       "VDirectiveKey",
+      "CallExpression[callee.name='t']",
+      "ImportDeclaration",
+      "ImportExpression",
+      "CallExpression[callee.type='MemberExpression'][callee.property.name='querySelector']",
+      "NewExpression[callee.name=/Error$/]",
       ...(context.options[0]?.ignoreNodes ?? []),
     ]
 
@@ -105,8 +104,6 @@ const rule: Rule.RuleModule = {
     const visitors: Rule.RuleListener = {
       Literal (node) {
         if (typeof node.value !== "string") return
-        if (isTranslationCall(node)) return
-        if (isImportSource(node)) return
         if (!isRawText(node.value, ignorePattern, ignoreText)) return
         if (isParent(node, ignoreNodes)) return
         context.report({ node, messageId: "rawText", data: { text: node.value.trim() } })
