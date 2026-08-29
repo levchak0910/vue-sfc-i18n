@@ -150,6 +150,15 @@ tester.run("no-raw-text", rule, {
       code: sfc("<p title=\"ignored text\" />"),
       options: [{ ignorePattern: ["^ignored"] }],
     },
+    // path-like strings excluded
+    { filename: "test.vue", code: script("const p = '/absolute/path'"), options: [{ checkJS: true }] },
+    { filename: "test.vue", code: script("const p = './relative/path'"), options: [{ checkJS: true }] },
+    { filename: "test.vue", code: script("const p = '../parent/path'"), options: [{ checkJS: true }] },
+    { filename: "test.vue", code: script("const p = '~/home/path'"), options: [{ checkJS: true }] },
+    { filename: "test.vue", code: script("const p = '/api/v1/users'"), options: [{ checkJS: true }] },
+    { filename: "test.vue", code: script("const p = 'api/v1/users'"), options: [{ checkJS: true }] },
+    { filename: "test.vue", code: script("const p = 'some/path'"), options: [{ checkJS: true }] },
+    { filename: "test.vue", code: script("const p = 'C:\\\\Windows\\\\System32'"), options: [{ checkJS: true }] },
     // svg elements excluded
     { filename: "test.vue", code: sfc("<svg><text>Raw label</text></svg>") },
     { filename: "test.vue", code: sfc("<svg><g><text>Nested raw text</text></g></svg>") },

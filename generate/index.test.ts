@@ -41,25 +41,42 @@ describe("generateKeys", () => {
     expect(content).not.toMatch(/"[^"]+": string/)
   })
 
-  it("collects keys from a single component", async () => {
+  it("includes files with no translations as empty objects", async () => {
+    await writeVue("Empty.vue", "<template><div/></template>")
+
+    await generateKeys(tmpDir, keysFile)
+    const content = await fs.readFile(keysFile, "utf-8")
+
+    expect(content).toMatch(/"Empty\.vue":\s*\{\s*\}/)
+  })
+
+  it("uses the file path as the first-level key", async () => {
+    await writeVue("Home.vue", sfc([i18nBlock("en", ["greeting: Hello"])]))
+
+    await generateKeys(tmpDir, keysFile)
+    const content = await fs.readFile(keysFile, "utf-8")
+
+    expect(content).toContain('"Home.vue": {')
+  })
+
+  it("uses relative paths for nested files", async () => {
+    await writeVue("views/Home.vue", sfc([i18nBlock("en", ["greeting: Hello"])]))
+
+    await generateKeys(tmpDir, keysFile)
+    const content = await fs.readFile(keysFile, "utf-8")
+
+    expect(content).toContain('"views/Home.vue": {')
+  })
+
+  it("collects translation keys inside the file entry", async () => {
     await writeVue("Home.vue", sfc([i18nBlock("en", ["greeting: Hello", "farewell: Goodbye"])]))
 
     await generateKeys(tmpDir, keysFile)
     const content = await fs.readFile(keysFile, "utf-8")
 
+    expect(content).toContain('"Home.vue": {')
     expect(content).toContain('"greeting": string')
     expect(content).toContain('"farewell": string')
-  })
-
-  it("collects keys from multiple components", async () => {
-    await writeVue("Home.vue", sfc([i18nBlock("en", ["greeting: Hello"])]))
-    await writeVue("About.vue", sfc([i18nBlock("en", ["about-title: About Us"])]))
-
-    await generateKeys(tmpDir, keysFile)
-    const content = await fs.readFile(keysFile, "utf-8")
-
-    expect(content).toContain('"greeting": string')
-    expect(content).toContain('"about-title": string')
   })
 
   it("collects keys from all locales of a component", async () => {
@@ -75,17 +92,20 @@ describe("generateKeys", () => {
     expect(content).toContain('"farewell": string')
   })
 
-  it("deduplicates keys appearing across multiple components and locales", async () => {
-    await writeVue("Home.vue", sfc([
-      i18nBlock("en", ["greeting: Hello"]),
-      i18nBlock("hu", ["greeting: Szia"]),
-    ]))
+  it("keeps keys from different files under separate file entries", async () => {
+    await writeVue("Home.vue", sfc([i18nBlock("en", ["greeting: Hello"])]))
+    await writeVue("About.vue", sfc([i18nBlock("en", ["about-title: About Us"])]))
 
     await generateKeys(tmpDir, keysFile)
     const content = await fs.readFile(keysFile, "utf-8")
 
-    const count = (content.match(/"greeting": string/g) ?? []).length
-    expect(count).toBe(1)
+    const homeBlock = content.match(/"Home\.vue":\s*\{([^}]*)\}/)?.[1] ?? ""
+    const aboutBlock = content.match(/"About\.vue":\s*\{([^}]*)\}/)?.[1] ?? ""
+
+    expect(homeBlock).toContain('"greeting"')
+    expect(homeBlock).not.toContain('"about-title"')
+    expect(aboutBlock).toContain('"about-title"')
+    expect(aboutBlock).not.toContain('"greeting"')
   })
 
   it("skips non-string values", async () => {
@@ -98,13 +118,17 @@ describe("generateKeys", () => {
     expect(content).not.toContain('"nested": string')
   })
 
-  it("collects keys from .vue files in subdirectories", async () => {
-    await writeVue("views/Home.vue", sfc([i18nBlock("en", ["greeting: Hello"])]))
+  it("deduplicates keys across locales within the same file", async () => {
+    await writeVue("Home.vue", sfc([
+      i18nBlock("en", ["greeting: Hello"]),
+      i18nBlock("hu", ["greeting: Szia"]),
+    ]))
 
     await generateKeys(tmpDir, keysFile)
     const content = await fs.readFile(keysFile, "utf-8")
 
-    expect(content).toContain('"greeting": string')
+    const count = (content.match(/"greeting": string/g) ?? []).length
+    expect(count).toBe(1)
   })
 
   it("produces exact module augmentation output", async () => {
@@ -116,7 +140,9 @@ describe("generateKeys", () => {
     expect(content).toBe(
       'declare module "@vue-sfc-i18n/composable" {\n'
       + "  interface I18nSchema {\n"
-      + '    "greeting": string\n'
+      + '    "Home.vue": {\n'
+      + '      "greeting": string\n'
+      + "    }\n"
       + "  }\n"
       + "}\n"
       + "\n"
@@ -156,18 +182,6 @@ describe("generateKeys", () => {
     expect(count).toHaveLength(1)
   })
 
-  it("collects params from the same key across files", async () => {
-    await writeVue("A.vue", sfc([i18nBlock("en", ["msg: Hi, {name}!"])]))
-    await writeVue("B.vue", sfc([i18nBlock("en", ["msg: Hey, {name}!"])]))
-
-    await generateKeys(tmpDir, keysFile)
-    const content = await fs.readFile(keysFile, "utf-8")
-    const count = content.match(/"msg":/g) ?? []
-
-    expect(content).toContain('"msg": { name: string | number }')
-    expect(count).toHaveLength(1)
-  })
-
   it("produces exact output for a key with placeholders", async () => {
     await writeVue("Home.vue", sfc([i18nBlock("en", ["greeting: Hello, {name}!"])]))
 
@@ -177,7 +191,9 @@ describe("generateKeys", () => {
     expect(content).toBe(
       'declare module "@vue-sfc-i18n/composable" {\n'
       + "  interface I18nSchema {\n"
-      + '    "greeting": { name: string | number }\n'
+      + '    "Home.vue": {\n'
+      + '      "greeting": { name: string | number }\n'
+      + "    }\n"
       + "  }\n"
       + "}\n"
       + "\n"

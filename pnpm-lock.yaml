@@ -40,6 +40,9 @@ importers:
       '@types/esquery':
         specifier: ^1.5.4
         version: 1.5.4
+      '@types/estree':
+        specifier: ^1.0.9
+        version: 1.0.9
       '@types/node':
         specifier: ^24.12.2
         version: 24.13.3

@@ -15,12 +15,15 @@ const isIdentifierLike = (value: string) =>
   /^[A-Z][a-z0-9]*([A-Z][a-zA-Z0-9]*)+$/.test(value) ||    // PascalCase (2+ words)
   /^[A-Z][A-Z0-9]*(_+[A-Z0-9]+)+$/.test(value)             // SCREAMING_SNAKE_CASE
 
+const isPathLike = (value: string) =>
+  /^(\.{1,2}[/\\]|~\/|[A-Za-z]:[/\\]|\/[\w/\\.-]*|[\w.-]+[/\\][\w/\\.-]*)/.test(value)
 
 function isRawText (value: string, ignorePattern: RegExp[], ignoreText: string[]): boolean {
   const trimmed = value.trim()
   return !(
     hasOnlyWhitespace(value) ||
     isIdentifierLike(trimmed) ||
+    isPathLike(trimmed) ||
     ignorePattern.some(re => re.test(trimmed)) ||
     ignoreText.includes(trimmed)
   )

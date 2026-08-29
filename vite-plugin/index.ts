@@ -127,6 +127,7 @@ export function i18nPlugin ({ entries, keysFile, srcDir }: { entries: string[], 
         return undefined
 
       let result = code.replaceAll(/<i18n\b[^>]*>[\S\s]*?<\/i18n>/gu, "")
+      result = result.replaceAll(/\buseI18n\(\s*(?:'[^']*'|"[^"]*"|`[^`]*`)\s*\)/gu, "useI18n()")
 
       const entryKey = entryKeyByFile.get(id)
       if (entryKey !== undefined) {

@@ -6,6 +6,7 @@ import noMissingParams from "./rules/no-missing-params.js"
 import sortKeysByUsage from "./rules/sort-keys-by-usage.js"
 import validParams from "./rules/valid-params.js"
 import noRawText from "./rules/no-raw-text.js"
+import requireUseI18nFile from "./rules/require-use-i18n-file.js"
 
 const plugin: ESLint.Plugin = {
   rules: {
@@ -15,6 +16,7 @@ const plugin: ESLint.Plugin = {
     "sort-keys-by-usage": sortKeysByUsage,
     "valid-params": validParams,
     "no-raw-text": noRawText,
+    "require-use-i18n-file": requireUseI18nFile,
   },
 }
 
