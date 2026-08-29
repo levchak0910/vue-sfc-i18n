@@ -6,7 +6,7 @@ import { getDocumentFragment } from "../utils/parser-services.js"
 function extractKeyOrder (templateSource: string, scriptSource: string): string[] {
   const keys: string[] = []
   const seen = new Set<string>()
-  const re = /\bt\((?:"(?<dq>[^"]+)"|'(?<sq>[^']+)')\)/gu
+  const re = /\bt\((?:"(?<dq>[^"]+)"|'(?<sq>[^']+)')/gu
 
   const collect = (text: string) => {
     for (const m of text.matchAll(re)) {
