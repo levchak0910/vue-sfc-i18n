@@ -60,6 +60,63 @@ test.describe("Home: interpolation", () => {
   })
 })
 
+test.describe("Home: pluralization", () => {
+  test("renders English singular form for count 1", async ({ page }) => {
+    await page.goto("/en")
+
+    await expect(page.getByTestId("items-singular")).toHaveText("one item")
+  })
+
+  test("renders English plural form with interpolated count for count 5", async ({ page }) => {
+    await page.goto("/en")
+
+    await expect(page.getByTestId("items-plural")).toHaveText("5 items")
+  })
+
+  test("renders Hungarian singular form for count 1", async ({ page }) => {
+    await page.goto("/hu")
+
+    await expect(page.getByTestId("items-singular")).toHaveText("egy elem")
+  })
+
+  test("renders Hungarian plural form with interpolated count for count 5", async ({ page }) => {
+    await page.goto("/hu")
+
+    await expect(page.getByTestId("items-plural")).toHaveText("5 elem")
+  })
+
+  test("plural form updates after language switch", async ({ page }) => {
+    await page.goto("/en")
+
+    await expect(page.getByTestId("items-singular")).toHaveText("one item")
+    await expect(page.getByTestId("items-plural")).toHaveText("5 items")
+
+    await page.getByTestId("btn-hu").click()
+
+    await expect(page.getByTestId("items-singular")).toHaveText("egy elem")
+    await expect(page.getByTestId("items-plural")).toHaveText("5 elem")
+  })
+
+  test("selects English singular variant without {n} interpolation", async ({ page }) => {
+    await page.goto("/en")
+
+    await expect(page.getByTestId("items-plain-singular")).toHaveText("item")
+  })
+
+  test("selects English plural variant without {n} interpolation", async ({ page }) => {
+    await page.goto("/en")
+
+    await expect(page.getByTestId("items-plain-plural")).toHaveText("items")
+  })
+
+  test("selects Hungarian singular and plural plain variants", async ({ page }) => {
+    await page.goto("/hu")
+
+    await expect(page.getByTestId("items-plain-singular")).toHaveText("elem")
+    await expect(page.getByTestId("items-plain-plural")).toHaveText("elemek")
+  })
+})
+
 test.describe("About: rendering", () => {
   test("renders English about-title and team when /en/about entered", async ({ page }) => {
     await page.goto("/en/about")
@@ -132,6 +189,8 @@ test.describe("chunk isolation @dev-only", () => {
 
     expect(translations).toHaveProperty("greeting", "Hello, {name}!")
     expect(translations).toHaveProperty("farewell", "Goodbye")
+    expect(translations).toHaveProperty("N items", "one item | {n} items")
+    expect(translations).toHaveProperty("items", "item | items")
     expect(translations).not.toHaveProperty("about-title")
     expect(translations).not.toHaveProperty("team")
     expect(translations).not.toHaveProperty("contacts-title")
@@ -145,6 +204,8 @@ test.describe("chunk isolation @dev-only", () => {
 
     expect(translations).toHaveProperty("greeting", "Szia, {name}!")
     expect(translations).toHaveProperty("farewell", "Viszlát")
+    expect(translations).toHaveProperty("N items", "egy elem | {n} elem")
+    expect(translations).toHaveProperty("items", "elem | elemek")
     expect(translations).not.toHaveProperty("about-title")
     expect(translations).not.toHaveProperty("team")
     expect(translations).not.toHaveProperty("contacts-title")
@@ -299,6 +360,8 @@ test.describe("chunk isolation @prod-only", () => {
 
     expect(translations).toHaveProperty("greeting", "Hello, {name}!")
     expect(translations).toHaveProperty("farewell", "Goodbye")
+    expect(translations).toHaveProperty("N items", "one item | {n} items")
+    expect(translations).toHaveProperty("items", "item | items")
     expect(translations).not.toHaveProperty("about-title")
     expect(translations).not.toHaveProperty("team")
     expect(translations).not.toHaveProperty("contacts-title")
@@ -312,6 +375,8 @@ test.describe("chunk isolation @prod-only", () => {
 
     expect(translations).toHaveProperty("greeting", "Szia, {name}!")
     expect(translations).toHaveProperty("farewell", "Viszlát")
+    expect(translations).toHaveProperty("N items", "egy elem | {n} elem")
+    expect(translations).toHaveProperty("items", "elem | elemek")
     expect(translations).not.toHaveProperty("about-title")
     expect(translations).not.toHaveProperty("team")
     expect(translations).not.toHaveProperty("contacts-title")

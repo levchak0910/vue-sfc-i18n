@@ -134,6 +134,62 @@ describe("manager.mergeTranslations", () => {
   })
 })
 
+describe("pluralization", () => {
+  it("selects the first variant for count 1 (default rule)", () => {
+    manager.mergeTranslations({ items: "one item | many items" })
+    const { t } = useI18n()
+    expect(t("items", 1)).toBe("one item")
+  })
+
+  it("selects the second variant for count != 1 (default rule)", () => {
+    manager.mergeTranslations({ items: "one item | many items" })
+    const { t } = useI18n()
+    expect(t("items", 5)).toBe("many items")
+  })
+
+  it("interpolates {n} in the selected variant", () => {
+    manager.mergeTranslations({ items: "one item | {n} items" })
+    const { t } = useI18n()
+    expect(t("items", 3)).toBe("3 items")
+  })
+
+  it("uses a custom plural rule for the active language", async () => {
+    manager.setPluralRules({
+      uk: (choice) => {
+        if (choice % 10 === 1 && choice !== 11) return 0
+        if (choice % 10 >= 2 && choice % 10 <= 4 && (choice < 12 || choice > 14)) return 1
+        return 2
+      },
+    })
+    manager.registerEntryLoader(() => Promise.resolve({ items: "предмет | предмети | предметів" }))
+    await manager.loadTranslations("uk")
+    const { t } = useI18n()
+    expect(t("items", 1)).toBe("предмет")
+    expect(t("items", 3)).toBe("предмети")
+    expect(t("items", 11)).toBe("предметів")
+  })
+
+  it("throws when rule index exceeds variant count", async () => {
+    manager.setPluralRules({ en: (_choice) => 5 })
+    manager.registerEntryLoader(() => Promise.resolve({ items: "one | many" }))
+    await manager.loadTranslations("en")
+    const { t } = useI18n()
+    expect(() => t("items", 1)).toThrow(
+      '[@vue-sfc-i18n/composable] plural rule returned index 5 for key "items", but only 2 variant(s) exist',
+    )
+  })
+
+  it("throws when rule returns a negative index", async () => {
+    manager.setPluralRules({ en: (_choice) => -1 })
+    manager.registerEntryLoader(() => Promise.resolve({ items: "one | many" }))
+    await manager.loadTranslations("en")
+    const { t } = useI18n()
+    expect(() => t("items", 1)).toThrow(
+      '[@vue-sfc-i18n/composable] plural rule returned index -1 for key "items", but only 2 variant(s) exist',
+    )
+  })
+})
+
 describe("manager.fetchEntryTranslations", () => {
   it("returns an empty object when no loaders are registered", async () => {
     const result = await manager.fetchEntryTranslations()

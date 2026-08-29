@@ -18,6 +18,13 @@ tester.run("valid-params", rule, {
     },
     { filename: "test.vue", code: `<template><div/></template>` },
     { filename: "test.ts", code: "const x = 1" },
+    { filename: "test.vue", code: withI18n("en", ["N items: one item | {n} items"]) },
+    { filename: "test.vue", code: withI18n("en", ["many items: one item | many items"]) },
+    {
+      filename: "test.vue",
+      code: withI18n("en", ["N items: one item | { n } items"]),
+      options: [{ spacing: "always" }],
+    },
   ],
   invalid: [
     {
@@ -73,6 +80,27 @@ tester.run("valid-params", rule, {
         { messageId: "notCamelCase", data: { name: "Name" } },
         { messageId: "notCamelCase", data: { name: "Age" } },
       ],
+    },
+    {
+      filename: "test.vue",
+      code: withI18n("en", ["items: one {count} item | {count} items"]),
+      errors: [
+        { messageId: "pluralOnlyN", data: { name: "count" } },
+        { messageId: "pluralOnlyN", data: { name: "count" } },
+      ],
+    },
+    {
+      filename: "test.vue",
+      code: withI18n("en", ["items: one {name} item | {n} items"]),
+      errors: [
+        { messageId: "pluralOnlyN", data: { name: "name" } },
+      ],
+    },
+    {
+      filename: "test.vue",
+      code: withI18n("en", ["N items: one item | { n } items"]),
+      errors: [{ messageId: "spacingNever", data: { name: "n" } }],
+      output: withI18n("en", ["N items: one item | {n} items"]),
     },
   ],
 })

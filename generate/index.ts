@@ -16,11 +16,16 @@ function extractParams (value: string): string[] {
   return result
 }
 
-function keyEntry (key: string, params: Set<string>): string {
-  if (params.size === 0)
+type KeyMeta = { params: Set<string>; isPlural: boolean }
+
+function keyEntry (key: string, meta: KeyMeta): string {
+  if (meta.isPlural)
+    return `      ${JSON.stringify(key)}: number`
+
+  if (meta.params.size === 0)
     return `      ${JSON.stringify(key)}: string`
 
-  const inner = [ ...params ].map(p => `${p}: string | number`).join("; ")
+  const inner = [ ...meta.params ].map(p => `${p}: string | number`).join("; ")
 
   return `      ${JSON.stringify(key)}: { ${inner} }`
 }
@@ -33,21 +38,28 @@ function keyEntry (key: string, params: Set<string>): string {
  */
 export async function generateKeys (srcDir: string, keysFile: string): Promise<void> {
   const files = await walkVueFiles(srcDir)
-  const perFile = new Map<string, Map<string, Set<string>>>()
+  const perFile = new Map<string, Map<string, KeyMeta>>()
 
   await Promise.all(
     files.map(async file => {
       const code = await fs.readFile(file, "utf-8")
       const translations = extractTranslations(code)
-      const keys = new Map<string, Set<string>>()
+      const keys = new Map<string, KeyMeta>()
 
       Object.values(translations).forEach(localeKeys => {
         Object.entries(localeKeys).forEach(([ key, value ]) => {
           if (!keys.has(key))
-            keys.set(key, new Set())
+            keys.set(key, { params: new Set(), isPlural: false })
 
-          for (const p of extractParams(value))
-            keys.get(key)!.add(p)
+          const meta = keys.get(key)!
+
+          if (value.includes("|")) {
+            meta.isPlural = true
+          }
+          else {
+            for (const p of extractParams(value))
+              meta.params.add(p)
+          }
         })
       })
 
@@ -58,7 +70,7 @@ export async function generateKeys (srcDir: string, keysFile: string): Promise<v
   const fileEntries = [ ...perFile.entries() ]
     .map(([ filePath, keys ]) => {
       const keyLines = [ ...keys.entries() ]
-        .map(([ k, params ]) => keyEntry(k, params))
+        .map(([ k, meta ]) => keyEntry(k, meta))
         .join("\n")
 
       return `    ${JSON.stringify(filePath)}: {\n${keyLines}\n    }`

@@ -39,7 +39,7 @@ const rule: Rule.RuleModule = {
 
         for (const block of i18nBlocks) {
           forEachKeyValue(src, block.contentRange, ({ key, value, valueParams, keyLoc }) => {
-            if (valueParams.length > 0 || key === value)
+            if (value.includes("|") || valueParams.length > 0 || key === value)
               return
 
             context.report({

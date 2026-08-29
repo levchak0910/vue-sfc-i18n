@@ -25,6 +25,7 @@ const rule: Rule.RuleModule = {
       notCamelCase: "Interpolation param '{{ name }}' must be camelCase.",
       spacingNever: "Remove spaces around interpolation param: use '{{{ name }}}'.",
       spacingAlways: "Add spaces around interpolation param: use '{ {{ name }} }'.",
+      pluralOnlyN: "Pluralized values only allow '{n}' as interpolation param, got '{{ name }}'.",
     },
   },
   create (context) {
@@ -42,9 +43,16 @@ const rule: Rule.RuleModule = {
         const src = context.sourceCode.getText()
 
         for (const block of getI18N(context, df)) {
-          forEachKeyValue(src, block.contentRange, ({ valueParams }) => {
+          forEachKeyValue(src, block.contentRange, ({ value, valueParams }) => {
+            const isPlural = value.includes("|")
+
             for (const param of valueParams) {
-              if (!CAMEL_CASE_RE.test(param.name)) {
+              if (isPlural && param.name !== "n") {
+                context.report({ loc: param.loc, messageId: "pluralOnlyN", data: { name: param.name } })
+                continue
+              }
+
+              if (!isPlural && !CAMEL_CASE_RE.test(param.name)) {
                 context.report({ loc: param.loc, messageId: "notCamelCase", data: { name: param.name } })
                 continue
               }

@@ -1,0 +1,79 @@
+import type { Rule } from "eslint"
+
+import { getI18N } from "../utils/get-block.js"
+import { getDocumentFragment } from "../utils/parser-services.js"
+import { forEachKeyValue } from "../utils/get-language-block-content.js"
+
+const toExpectedKey = (value: string): string =>
+  value.replace(/\{([^}]+)\}/g, (_, inner: string) => inner.trim().toUpperCase())
+
+const rule: Rule.RuleModule = {
+  meta: {
+    type: "problem",
+    hasSuggestions: true,
+    schema: [
+      {
+        type: "object",
+        properties: {
+          locale: { type: "string" },
+        },
+        additionalProperties: false,
+      },
+    ],
+    messages: {
+      mismatch: "i18n plural key '{{ key }}' in language '{{ language }}' must equal its last variant (expected '{{ expected }}').",
+      replaceWithExpected: "Replace key with '{{ expected }}'.",
+    },
+  },
+  create (context: Rule.RuleContext) {
+    const language: string = (context.options[0] as undefined | { locale?: string })?.locale ?? "en"
+
+    return {
+      Program () {
+        if (!context.filename.endsWith(".vue"))
+          return
+
+        const df = getDocumentFragment(context)
+        if (df === null)
+          return
+
+        const src = context.sourceCode.getText()
+        const i18nBlocks = getI18N(context, df).filter(b => b.language === language)
+
+        for (const block of i18nBlocks) {
+          forEachKeyValue(src, block.contentRange, ({ key, value, keyLoc }) => {
+            if (!value.includes("|"))
+              return
+
+            const lastVariant = value.split("|").at(-1)!.trim()
+            const expected = toExpectedKey(lastVariant)
+
+            if (key === expected)
+              return
+
+            context.report({
+              loc: keyLoc,
+              messageId: "mismatch",
+              data: { key, language, expected },
+              suggest: [
+                {
+                  messageId: "replaceWithExpected",
+                  data: { expected },
+                  fix: fixer => fixer.replaceTextRange(
+                    [
+                      context.sourceCode.getIndexFromLoc(keyLoc.start),
+                      context.sourceCode.getIndexFromLoc(keyLoc.end),
+                    ],
+                    expected,
+                  ),
+                },
+              ],
+            })
+          })
+        }
+      },
+    }
+  },
+}
+
+export default rule

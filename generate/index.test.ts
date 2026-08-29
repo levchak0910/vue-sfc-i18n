@@ -131,6 +131,37 @@ describe("generateKeys", () => {
     expect(count).toBe(1)
   })
 
+  it("emits number type for a plural key", async () => {
+    await writeVue("Home.vue", sfc([i18nBlock("en", ["items: one item | many items"])]))
+
+    await generateKeys(tmpDir, keysFile)
+    const content = await fs.readFile(keysFile, "utf-8")
+
+    expect(content).toContain('"items": number')
+  })
+
+  it("emits number type even when {n} appears in a plural variant", async () => {
+    await writeVue("Home.vue", sfc([i18nBlock("en", ["items: one item | {n} items"])]))
+
+    await generateKeys(tmpDir, keysFile)
+    const content = await fs.readFile(keysFile, "utf-8")
+
+    expect(content).toContain('"items": number')
+    expect(content).not.toContain('"n"')
+  })
+
+  it("treats a key as plural if any locale value contains a pipe", async () => {
+    await writeVue("Home.vue", sfc([
+      i18nBlock("en", ["items: one item | many items"]),
+      i18nBlock("uk", ["items: предмет | предмети | предметів"]),
+    ]))
+
+    await generateKeys(tmpDir, keysFile)
+    const content = await fs.readFile(keysFile, "utf-8")
+
+    expect(content).toContain('"items": number')
+  })
+
   it("produces exact module augmentation output", async () => {
     await writeVue("Home.vue", sfc([i18nBlock("en", ["greeting: Hello"])]))
 
