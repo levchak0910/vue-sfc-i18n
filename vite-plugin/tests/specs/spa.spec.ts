@@ -1,7 +1,7 @@
 import { expect, test } from "@playwright/test"
+
 import { collectTranslations, trackLoaded } from "../utils/network"
 import { pageSettled } from "../utils/page"
-
 
 test.describe("Home: rendering", () => {
   test("renders English greeting and farewell when /en entered", async ({ page }) => {

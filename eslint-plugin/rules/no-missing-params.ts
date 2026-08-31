@@ -1,8 +1,8 @@
 import type { Rule } from "eslint"
 
 import { getI18N } from "../utils/get-block.js"
-import { getDocumentFragment } from "../utils/parser-services.js"
 import { forEachKeyValue } from "../utils/get-language-block-content.js"
+import { getDocumentFragment } from "../utils/parser-services.js"
 
 type KeyEntry = {
   params: Set<string>
@@ -14,18 +14,17 @@ const rule: Rule.RuleModule = {
     type: "problem",
     schema: [],
     messages: {
-      missingParam: "Key '{{ key }}' in locale '{{ locale }}' is missing param '{{ param }}' (present in {{ otherLocales }}).",
+      missingParam:
+        "Key '{{ key }}' in locale '{{ locale }}' is missing param '{{ param }}' (present in {{ otherLocales }}).",
     },
   },
-  create (context) {
+  create(context) {
     return {
-      Program () {
-        if (!context.filename.endsWith(".vue"))
-          return
+      Program() {
+        if (!context.filename.endsWith(".vue")) return
 
         const df = getDocumentFragment(context)
-        if (df === null)
-          return
+        if (df === null) return
 
         const src = context.sourceCode.getText()
 
@@ -34,8 +33,7 @@ const rule: Rule.RuleModule = {
 
         for (const block of getI18N(context, df)) {
           forEachKeyValue(src, block.contentRange, ({ key, valueParams, keyLoc }) => {
-            if (!byKey.has(key))
-              byKey.set(key, new Map())
+            if (!byKey.has(key)) byKey.set(key, new Map())
 
             byKey.get(key)!.set(block.language, {
               params: new Set(valueParams.map(p => p.name)),
@@ -44,25 +42,22 @@ const rule: Rule.RuleModule = {
           })
         }
 
-        for (const [ key, localeMap ] of byKey) {
-          if (localeMap.size < 2)
-            continue
+        for (const [key, localeMap] of byKey) {
+          if (localeMap.size < 2) continue
 
           // param → locales that use it
           const paramLocales = new Map<string, string[]>()
-          for (const [ locale, entry ] of localeMap) {
+          for (const [locale, entry] of localeMap) {
             for (const param of entry.params) {
-              if (!paramLocales.has(param))
-                paramLocales.set(param, [])
-              
+              if (!paramLocales.has(param)) paramLocales.set(param, [])
+
               paramLocales.get(param)!.push(locale)
             }
           }
 
-          for (const [ locale, entry ] of localeMap) {
-            for (const [ param, presentIn ] of paramLocales) {
-              if (entry.params.has(param))
-                continue
+          for (const [locale, entry] of localeMap) {
+            for (const [param, presentIn] of paramLocales) {
+              if (entry.params.has(param)) continue
 
               context.report({
                 loc: entry.loc,

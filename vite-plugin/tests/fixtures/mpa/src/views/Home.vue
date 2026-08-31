@@ -11,8 +11,9 @@
 
 <script setup lang="ts">
 import { useI18n } from "@vue-sfc-i18n/composable"
-import Default from "../layouts/Default.vue"
+
 import type { View } from "../../../shared/routing"
+import Default from "../layouts/Default.vue"
 
 defineProps<{ lang: string; view: View }>()
 const { t } = useI18n()

@@ -22,38 +22,50 @@ tester.run("key-equals-interpolated-value", rule, {
     {
       filename: "test.vue",
       code: withI18n("en", ["greeting: Hello, {name}!"]),
-      errors: [{
-        messageId: "mismatch",
-        data: { key: "greeting", language: "en", expected: "Hello, NAME!" },
-        suggestions: [{
-          messageId: "replaceWithExpected",
-          output: withI18n("en", ["Hello, NAME!: Hello, {name}!"]),
-        }],
-      }],
+      errors: [
+        {
+          messageId: "mismatch",
+          data: { key: "greeting", language: "en", expected: "Hello, NAME!" },
+          suggestions: [
+            {
+              messageId: "replaceWithExpected",
+              output: withI18n("en", ["Hello, NAME!: Hello, {name}!"]),
+            },
+          ],
+        },
+      ],
     },
     {
       filename: "test.vue",
       code: withI18n("en", ["greeting: Hello, {someName}!"]),
-      errors: [{
-        messageId: "mismatch",
-        data: { key: "greeting", language: "en", expected: "Hello, SOME_NAME!" },
-        suggestions: [{
-          messageId: "replaceWithExpected",
-          output: withI18n("en", ["Hello, SOME_NAME!: Hello, {someName}!"]),
-        }],
-      }],
+      errors: [
+        {
+          messageId: "mismatch",
+          data: { key: "greeting", language: "en", expected: "Hello, SOME_NAME!" },
+          suggestions: [
+            {
+              messageId: "replaceWithExpected",
+              output: withI18n("en", ["Hello, SOME_NAME!: Hello, {someName}!"]),
+            },
+          ],
+        },
+      ],
     },
     {
       filename: "test.vue",
       code: withI18n("en", ["greeting: Hello, {name}!", "farewell: Goodbye"]),
-      errors: [{
-        messageId: "mismatch",
-        data: { key: "greeting", language: "en", expected: "Hello, NAME!" },
-        suggestions: [{
-          messageId: "replaceWithExpected",
-          output: withI18n("en", ["Hello, NAME!: Hello, {name}!", "farewell: Goodbye"]),
-        }],
-      }],
+      errors: [
+        {
+          messageId: "mismatch",
+          data: { key: "greeting", language: "en", expected: "Hello, NAME!" },
+          suggestions: [
+            {
+              messageId: "replaceWithExpected",
+              output: withI18n("en", ["Hello, NAME!: Hello, {name}!", "farewell: Goodbye"]),
+            },
+          ],
+        },
+      ],
     },
   ],
 })

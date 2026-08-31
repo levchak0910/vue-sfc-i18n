@@ -1,6 +1,7 @@
 import * as fs from "node:fs/promises"
-import * as path from "node:path"
 import * as os from "node:os"
+import * as path from "node:path"
+
 import { afterEach, beforeEach, describe, expect, it } from "vitest"
 
 import { extractTranslations, walkVueFiles } from "./index"
@@ -8,9 +9,8 @@ import { extractTranslations, walkVueFiles } from "./index"
 describe("extractTranslations", () => {
   const sfc = (blocks: string[]): string => `<template><div/></template>\n${blocks.join("\n")}`
 
-  const i18nBlock = (locale: string, content: string[]): string => (
+  const i18nBlock = (locale: string, content: string[]): string =>
     `<i18n locale="${locale}">\n${content.join("\n")}\n</i18n>`
-  )
 
   it("returns empty object for a component without i18n blocks", () => {
     expect(extractTranslations(sfc([]))).toEqual({})
@@ -25,10 +25,7 @@ describe("extractTranslations", () => {
   })
 
   it("extracts translations from multiple blocks with different locales", () => {
-    const code = sfc([
-      i18nBlock("en", ["greeting: Hello"]),
-      i18nBlock("hu", ["greeting: Szia"]),
-    ])
+    const code = sfc([i18nBlock("en", ["greeting: Hello"]), i18nBlock("hu", ["greeting: Szia"])])
 
     expect(extractTranslations(code)).toEqual({
       en: { greeting: "Hello" },

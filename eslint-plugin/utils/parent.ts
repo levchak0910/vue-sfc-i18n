@@ -1,8 +1,8 @@
 import type { Rule } from "eslint"
-import type { AST } from "vue-eslint-parser"
 import esquery from "esquery"
+import type { AST } from "vue-eslint-parser"
 
-export function isParent (node: Rule.Node | AST.Node, selectors: string[]): boolean {
+export function isParent(node: Rule.Node | AST.Node, selectors: string[]): boolean {
   const parsed = selectors.map(s => esquery.parse(s))
   let current: Rule.Node | null = node.parent as Rule.Node | null
   while (current != null) {

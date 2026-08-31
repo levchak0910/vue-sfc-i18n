@@ -13,7 +13,7 @@ tester.run("require-use-i18n-file", rule, {
     },
     {
       filename: "/project/src/views/Home.vue",
-      code: script("const { t } = useI18n(\"views/Home.vue\")"),
+      code: script('const { t } = useI18n("views/Home.vue")'),
       options: [{ srcDir: "/project/src" }],
     },
     // no srcDir — any string is accepted
@@ -35,14 +35,14 @@ tester.run("require-use-i18n-file", rule, {
       code: script("const { t } = useI18n()"),
       options: [{ srcDir: "/project/src" }],
       errors: [{ messageId: "missingFile" }],
-      output: script("const { t } = useI18n(\"views/Home.vue\")"),
+      output: script('const { t } = useI18n("views/Home.vue")'),
     },
     {
       filename: "/project/src/components/AppHeader.vue",
       code: script("const { t } = useI18n()"),
       options: [{ srcDir: "/project/src" }],
       errors: [{ messageId: "missingFile" }],
-      output: script("const { t } = useI18n(\"components/AppHeader.vue\")"),
+      output: script('const { t } = useI18n("components/AppHeader.vue")'),
     },
     // wrong path — rewrite to correct one
     {
@@ -50,7 +50,7 @@ tester.run("require-use-i18n-file", rule, {
       code: script("const { t } = useI18n('views/Other.vue')"),
       options: [{ srcDir: "/project/src" }],
       errors: [{ messageId: "wrongFile", data: { actual: "views/Other.vue", expected: "views/Home.vue" } }],
-      output: script("const { t } = useI18n(\"views/Home.vue\")"),
+      output: script('const { t } = useI18n("views/Home.vue")'),
     },
     // non-string argument
     {

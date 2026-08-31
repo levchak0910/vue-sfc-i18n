@@ -67,9 +67,7 @@ describe("useI18n", () => {
 
 describe("manager.getLanguage", () => {
   it("throws when language has not been set", () => {
-    expect(() => manager.getLanguage()).toThrow(
-      "[@vue-sfc-i18n/composable] language is not set",
-    )
+    expect(() => manager.getLanguage()).toThrow("[@vue-sfc-i18n/composable] language is not set")
   })
 
   it("returns the language set by loadTranslations", async () => {
@@ -155,7 +153,7 @@ describe("pluralization", () => {
 
   it("uses a custom plural rule for the active language", async () => {
     manager.setPluralRules({
-      uk: (choice) => {
+      uk: choice => {
         if (choice % 10 === 1 && choice !== 11) return 0
         if (choice % 10 >= 2 && choice % 10 <= 4 && (choice < 12 || choice > 14)) return 1
         return 2
@@ -170,7 +168,7 @@ describe("pluralization", () => {
   })
 
   it("throws when rule index exceeds variant count", async () => {
-    manager.setPluralRules({ en: (_choice) => 5 })
+    manager.setPluralRules({ en: _choice => 5 })
     manager.registerEntryLoader(() => Promise.resolve({ items: "one | many" }))
     await manager.loadTranslations("en")
     const { t } = useI18n()
@@ -180,7 +178,7 @@ describe("pluralization", () => {
   })
 
   it("throws when rule returns a negative index", async () => {
-    manager.setPluralRules({ en: (_choice) => -1 })
+    manager.setPluralRules({ en: _choice => -1 })
     manager.registerEntryLoader(() => Promise.resolve({ items: "one | many" }))
     await manager.loadTranslations("en")
     const { t } = useI18n()

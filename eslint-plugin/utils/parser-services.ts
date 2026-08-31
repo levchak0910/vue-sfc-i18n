@@ -6,15 +6,15 @@ type ParserServices = {
   defineTemplateBodyVisitor: (visitor: Rule.RuleListener, scriptVisitor?: Rule.RuleListener) => Rule.RuleListener
 }
 
-function getParserServices (context: Rule.RuleContext): ParserServices {
+function getParserServices(context: Rule.RuleContext): ParserServices {
   return context.sourceCode.parserServices as ParserServices
 }
 
-export function getDocumentFragment (context: Rule.RuleContext): AST.VDocumentFragment | null {
+export function getDocumentFragment(context: Rule.RuleContext): AST.VDocumentFragment | null {
   return getParserServices(context).getDocumentFragment()
 }
 
-export function defineTemplateBodyVisitor (
+export function defineTemplateBodyVisitor(
   context: Rule.RuleContext,
   visitor: Rule.RuleListener,
   scriptVisitor: Rule.RuleListener = visitor,

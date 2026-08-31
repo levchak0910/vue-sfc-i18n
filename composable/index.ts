@@ -6,10 +6,10 @@ export interface I18nSchema {}
 type KeysOf<F extends string> = F extends keyof I18nSchema ? keyof I18nSchema[F] : keyof I18nSchema[keyof I18nSchema]
 
 type ParamsArg<F extends keyof I18nSchema, K extends KeysOf<F>> = K extends keyof I18nSchema[F]
-    ? I18nSchema[F][K] extends string
-      ? []
-      : [params: I18nSchema[F][K]]
-    : [params?: Record<string, string | number> | number]
+  ? I18nSchema[F][K] extends string
+    ? []
+    : [params: I18nSchema[F][K]]
+  : [params?: Record<string, string | number> | number]
 
 const translations = ref<Record<string, string>>({})
 const language = ref<null | string>(null)
@@ -19,7 +19,7 @@ const entryLoaders: EntryLoader[] = []
 
 export type PluralRule = (choice: number) => number
 
-const defaultPluralRule: PluralRule = (choice) => choice === 1 ? 0 : 1
+const defaultPluralRule: PluralRule = choice => (choice === 1 ? 0 : 1)
 
 const pluralRules: Record<string, PluralRule> = {}
 
@@ -38,7 +38,9 @@ export const useI18n = <F extends keyof I18nSchema = keyof I18nSchema>(_filePath
       const variant = parts[index]
 
       if (index < 0 || variant === undefined)
-        throw new Error(`[@vue-sfc-i18n/composable] plural rule returned index ${index} for key "${key as string}", but only ${parts.length} variant(s) exist`)
+        throw new Error(
+          `[@vue-sfc-i18n/composable] plural rule returned index ${index} for key "${key as string}", but only ${parts.length} variant(s) exist`,
+        )
 
       return interpolate(variant, { n: arg })
     }
@@ -51,14 +53,13 @@ export const useI18n = <F extends keyof I18nSchema = keyof I18nSchema>(_filePath
 
 export const manager = {
   /** @private */
-  getLanguage (): string {
-    if (language.value === null)
-      throw new Error("[@vue-sfc-i18n/composable] language is not set")
+  getLanguage(): string {
+    if (language.value === null) throw new Error("[@vue-sfc-i18n/composable] language is not set")
 
     return language.value
   },
 
-  async loadTranslations (lang: string): Promise<void> {
+  async loadTranslations(lang: string): Promise<void> {
     language.value = lang
     const data = await manager.fetchEntryTranslations()
 
@@ -69,22 +70,22 @@ export const manager = {
   },
 
   /** @private */
-  mergeTranslations (data: Record<string, string>): void {
+  mergeTranslations(data: Record<string, string>): void {
     translations.value = { ...translations.value, ...data }
   },
 
   /** @private */
-  registerEntryLoader (fn: EntryLoader): void {
+  registerEntryLoader(fn: EntryLoader): void {
     entryLoaders.push(fn)
   },
 
   /** @private */
-  async fetchEntryTranslations (): Promise<Record<string, string>> {
+  async fetchEntryTranslations(): Promise<Record<string, string>> {
     const results = await Promise.all(entryLoaders.map(fn => fn()))
     return results.reduce<Record<string, string>>((acc, r) => ({ ...acc, ...r }), {})
   },
 
-  setPluralRules (rules: Record<string, PluralRule>): void {
+  setPluralRules(rules: Record<string, PluralRule>): void {
     Object.assign(pluralRules, rules)
   },
 }

@@ -1,4 +1,5 @@
 import * as path from "node:path"
+
 import type { Rule } from "eslint"
 import type { CallExpression } from "estree"
 
@@ -21,11 +22,11 @@ const rule: Rule.RuleModule = {
       wrongFile: "useI18n() path '{{ actual }}' does not match this file's path '{{ expected }}'.",
     },
   },
-  create (context) {
+  create(context) {
     if (!context.filename.endsWith(".vue")) return {}
 
     return {
-      "CallExpression[callee.name='useI18n']" (node: CallExpression) {
+      "CallExpression[callee.name='useI18n']"(node: CallExpression) {
         const srcDir: string | undefined = context.options[0]?.srcDir
         const expectedPath = srcDir ? path.relative(srcDir, context.filename).split(path.sep).join("/") : null
 
@@ -33,10 +34,13 @@ const rule: Rule.RuleModule = {
           context.report({
             node,
             messageId: "missingFile",
-            fix: expectedPath === null ? undefined : (fixer) => {
-              const openParen = context.sourceCode.getTokenAfter(node.callee)!
-              return fixer.insertTextAfter(openParen, JSON.stringify(expectedPath))
-            },
+            fix:
+              expectedPath === null
+                ? undefined
+                : fixer => {
+                    const openParen = context.sourceCode.getTokenAfter(node.callee)!
+                    return fixer.insertTextAfter(openParen, JSON.stringify(expectedPath))
+                  },
           })
           return
         }

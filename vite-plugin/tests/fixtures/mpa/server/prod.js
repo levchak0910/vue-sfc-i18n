@@ -1,6 +1,7 @@
-import { createServer } from "node:http"
 import { createReadStream, existsSync, readFileSync } from "node:fs"
+import { createServer } from "node:http"
 import { extname } from "node:path"
+
 import { MIME, root } from "./shared.js"
 
 export async function setup() {

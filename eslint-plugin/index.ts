@@ -1,13 +1,13 @@
 import type { ESLint } from "eslint"
 
-import keyEqualsPlainValue from "./rules/key-equals-plain-value.js"
 import keyEqualsInterpolatedValue from "./rules/key-equals-interpolated-value.js"
+import keyEqualsPlainValue from "./rules/key-equals-plain-value.js"
 import keyEqualsPluralValue from "./rules/key-equals-plural-value.js"
 import noMissingParams from "./rules/no-missing-params.js"
-import sortKeysByUsage from "./rules/sort-keys-by-usage.js"
-import validParams from "./rules/valid-params.js"
 import noRawText from "./rules/no-raw-text.js"
 import requireUseI18nFile from "./rules/require-use-i18n-file.js"
+import sortKeysByUsage from "./rules/sort-keys-by-usage.js"
+import validParams from "./rules/valid-params.js"
 
 const plugin: ESLint.Plugin = {
   rules: {

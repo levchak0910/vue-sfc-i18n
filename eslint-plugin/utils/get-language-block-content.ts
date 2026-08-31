@@ -1,6 +1,6 @@
 type Loc = { column: number; line: number }
 
-function offsetToLoc (src: string, offset: number): Loc {
+function offsetToLoc(src: string, offset: number): Loc {
   const before = src.slice(0, offset)
   return {
     line: before.split("\n").length,
@@ -10,8 +10,8 @@ function offsetToLoc (src: string, offset: number): Loc {
 
 type Param = { name: string; loc: { end: Loc; start: Loc } }
 
-function parseParams (src: string, value: string, valueAbsStart: number): Param[] {
-  return [ ...value.matchAll(/\{([^}]+)\}/g) ].map(m => ({
+function parseParams(src: string, value: string, valueAbsStart: number): Param[] {
+  return [...value.matchAll(/\{([^}]+)\}/g)].map(m => ({
     name: m[1].trim(),
     loc: {
       start: offsetToLoc(src, valueAbsStart + (m.index ?? 0)),
@@ -30,12 +30,12 @@ type KeyValueEntry = {
   absAt: (valueOffset: number) => number
 }
 
-export function forEachKeyValue (
+export function forEachKeyValue(
   src: string,
   contentRange: [number, number],
   callback: (entry: KeyValueEntry) => void,
 ): void {
-  const [ blockStart, blockEnd ] = contentRange
+  const [blockStart, blockEnd] = contentRange
   const content = src.slice(blockStart, blockEnd)
 
   let lineOffset = 0

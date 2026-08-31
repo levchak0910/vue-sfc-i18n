@@ -1,6 +1,7 @@
+import { manager } from "@vue-sfc-i18n/composable"
 import { createSSRApp, type Component } from "vue"
 import { renderToString } from "vue/server-renderer"
-import { manager } from "@vue-sfc-i18n/composable"
+
 import { parsePath } from "../../shared/routing"
 
 export async function render(url: string): Promise<string> {

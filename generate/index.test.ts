@@ -1,6 +1,7 @@
 import * as fs from "node:fs/promises"
-import * as path from "node:path"
 import * as os from "node:os"
+import * as path from "node:path"
+
 import { afterEach, beforeEach, describe, expect, it } from "vitest"
 
 import { generateKeys } from "./index"
@@ -27,9 +28,8 @@ describe("generateKeys", () => {
 
   const sfc = (blocks: string[]): string => `<template><div/></template>\n${blocks.join("\n")}`
 
-  const i18nBlock = (locale: string, content: string[]): string => (
+  const i18nBlock = (locale: string, content: string[]): string =>
     `<i18n locale="${locale}">\n${content.join("\n")}\n</i18n>`
-  )
 
   it("writes an empty schema for a directory with no .vue files", async () => {
     await generateKeys(tmpDir, keysFile)
@@ -80,10 +80,7 @@ describe("generateKeys", () => {
   })
 
   it("collects keys from all locales of a component", async () => {
-    await writeVue("Home.vue", sfc([
-      i18nBlock("en", ["greeting: Hello"]),
-      i18nBlock("hu", ["farewell: Viszlát"]),
-    ]))
+    await writeVue("Home.vue", sfc([i18nBlock("en", ["greeting: Hello"]), i18nBlock("hu", ["farewell: Viszlát"])]))
 
     await generateKeys(tmpDir, keysFile)
     const content = await fs.readFile(keysFile, "utf-8")
@@ -119,10 +116,7 @@ describe("generateKeys", () => {
   })
 
   it("deduplicates keys across locales within the same file", async () => {
-    await writeVue("Home.vue", sfc([
-      i18nBlock("en", ["greeting: Hello"]),
-      i18nBlock("hu", ["greeting: Szia"]),
-    ]))
+    await writeVue("Home.vue", sfc([i18nBlock("en", ["greeting: Hello"]), i18nBlock("hu", ["greeting: Szia"])]))
 
     await generateKeys(tmpDir, keysFile)
     const content = await fs.readFile(keysFile, "utf-8")
@@ -151,10 +145,13 @@ describe("generateKeys", () => {
   })
 
   it("treats a key as plural if any locale value contains a pipe", async () => {
-    await writeVue("Home.vue", sfc([
-      i18nBlock("en", ["items: one item | many items"]),
-      i18nBlock("uk", ["items: предмет | предмети | предметів"]),
-    ]))
+    await writeVue(
+      "Home.vue",
+      sfc([
+        i18nBlock("en", ["items: one item | many items"]),
+        i18nBlock("uk", ["items: предмет | предмети | предметів"]),
+      ]),
+    )
 
     await generateKeys(tmpDir, keysFile)
     const content = await fs.readFile(keysFile, "utf-8")
@@ -170,14 +167,14 @@ describe("generateKeys", () => {
 
     expect(content).toBe(
       'declare module "@vue-sfc-i18n/composable" {\n'
-      + "  interface I18nSchema {\n"
-      + '    "Home.vue": {\n'
-      + '      "greeting": string\n'
-      + "    }\n"
-      + "  }\n"
-      + "}\n"
-      + "\n"
-      + "export {}\n",
+        + "  interface I18nSchema {\n"
+        + '    "Home.vue": {\n'
+        + '      "greeting": string\n'
+        + "    }\n"
+        + "  }\n"
+        + "}\n"
+        + "\n"
+        + "export {}\n",
     )
   })
 
@@ -200,10 +197,7 @@ describe("generateKeys", () => {
   })
 
   it("unions params from the same key across locales", async () => {
-    await writeVue("Home.vue", sfc([
-      i18nBlock("en", ["msg: Hello, {name}!"]),
-      i18nBlock("hu", ["msg: Szia, {name}!"]),
-    ]))
+    await writeVue("Home.vue", sfc([i18nBlock("en", ["msg: Hello, {name}!"]), i18nBlock("hu", ["msg: Szia, {name}!"])]))
 
     await generateKeys(tmpDir, keysFile)
     const content = await fs.readFile(keysFile, "utf-8")
@@ -221,14 +215,14 @@ describe("generateKeys", () => {
 
     expect(content).toBe(
       'declare module "@vue-sfc-i18n/composable" {\n'
-      + "  interface I18nSchema {\n"
-      + '    "Home.vue": {\n'
-      + '      "greeting": { name: string | number }\n'
-      + "    }\n"
-      + "  }\n"
-      + "}\n"
-      + "\n"
-      + "export {}\n",
+        + "  interface I18nSchema {\n"
+        + '    "Home.vue": {\n'
+        + '      "greeting": { name: string | number }\n'
+        + "    }\n"
+        + "  }\n"
+        + "}\n"
+        + "\n"
+        + "export {}\n",
     )
   })
 })

@@ -1,6 +1,7 @@
 import type { Page } from "@playwright/test"
-import { parseTranslations } from "./parse"
+
 import { pageSettled } from "./page"
+import { parseTranslations } from "./parse"
 
 export type Mode = "dev" | "prod"
 
@@ -35,11 +36,7 @@ const strategies: Record<Mode, Strategy> = {
   },
 }
 
-export function collectTranslations(
-  mode: Mode,
-  page: Page,
-  entry?: string,
-): () => Promise<Record<string, string>> {
+export function collectTranslations(mode: Mode, page: Page, entry?: string): () => Promise<Record<string, string>> {
   const s = strategies[mode]
   if (entry) {
     const p = page.waitForResponse(r => s.matchesEntry(r.url(), entry))

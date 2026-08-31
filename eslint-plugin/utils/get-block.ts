@@ -1,24 +1,25 @@
 import type { Rule } from "eslint"
 import type { AST } from "vue-eslint-parser"
 
-type Expose = { content: string, contentRange: [number, number], contentLine: number }
+type Expose = { content: string; contentRange: [number, number]; contentLine: number }
 
-const getContentRange = (node: AST.VElement | AST.VExpressionContainer | AST.VStyleElement | AST.VText, src: string): [number, number] => {
-  if (node.type !== "VElement")
-    return [ 0, 0 ]
+const getContentRange = (
+  node: AST.VElement | AST.VExpressionContainer | AST.VStyleElement | AST.VText,
+  src: string,
+): [number, number] => {
+  if (node.type !== "VElement") return [0, 0]
 
   const start = node.startTag.range[1]
   const end = node.endTag?.range[0] ?? start
   const inner = src.slice(start, end)
   const leadingLen = /^\s*/.exec(inner)?.[0].length ?? 0
   const trailingLen = /\s*$/.exec(inner)?.[0].length ?? 0
-  return [ start + leadingLen, end - trailingLen ]
+  return [start + leadingLen, end - trailingLen]
 }
-const getContentLine = (node: AST.VElement | AST.VExpressionContainer | AST.VStyleElement | AST.VText): number => (
+const getContentLine = (node: AST.VElement | AST.VExpressionContainer | AST.VStyleElement | AST.VText): number =>
   node.loc.start.line
-)
 
-export function getI18N (context: Rule.RuleContext, df: AST.VDocumentFragment): Array<Expose & { language: string }> {
+export function getI18N(context: Rule.RuleContext, df: AST.VDocumentFragment): Array<Expose & { language: string }> {
   const i18n = df.children.filter(child => child.type === "VElement" && child.name === "i18n")
 
   return i18n.map(block => ({
@@ -26,6 +27,11 @@ export function getI18N (context: Rule.RuleContext, df: AST.VDocumentFragment): 
     content: context.sourceCode.getText(block),
     contentRange: getContentRange(block, context.sourceCode.getText()),
     contentLine: getContentLine(block),
-    language: ((block as AST.VElement).startTag.attributes.find(a => a.key.name === "locale")?.value as undefined | AST.VLiteral)?.value ?? "",
+    language:
+      (
+        (block as AST.VElement).startTag.attributes.find(a => a.key.name === "locale")?.value as
+          | undefined
+          | AST.VLiteral
+      )?.value ?? "",
   }))
 }

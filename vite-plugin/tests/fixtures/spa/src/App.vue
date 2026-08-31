@@ -16,8 +16,9 @@
 </template>
 
 <script setup lang="ts">
-import { defineAsyncComponent, onMounted, onUnmounted, ref } from "vue"
 import { manager } from "@vue-sfc-i18n/composable"
+import { defineAsyncComponent, onMounted, onUnmounted, ref } from "vue"
+
 import { parsePath, toPath, type View } from "../../shared/routing"
 
 const Home = defineAsyncComponent(() => import("./views/Home.vue"))

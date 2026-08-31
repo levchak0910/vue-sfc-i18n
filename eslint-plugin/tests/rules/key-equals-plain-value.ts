@@ -19,39 +19,51 @@ tester.run("key-equals-plain-value", rule, {
     {
       filename: "test.vue",
       code: withI18n("en", "greeting: Hello World"),
-      errors: [{
-        messageId: "mismatch",
-        data: { key: "greeting", value: "Hello World", language: "en" },
-        suggestions: [{
-          messageId: "replaceWithValue",
-          output: withI18n("en", "Hello World: Hello World"),
-        }],
-      }],
+      errors: [
+        {
+          messageId: "mismatch",
+          data: { key: "greeting", value: "Hello World", language: "en" },
+          suggestions: [
+            {
+              messageId: "replaceWithValue",
+              output: withI18n("en", "Hello World: Hello World"),
+            },
+          ],
+        },
+      ],
     },
     {
       filename: "test.vue",
       code: withI18n("en", "greeting: greeting\nfarewell: Goodbye"),
-      errors: [{
-        messageId: "mismatch",
-        data: { key: "farewell", value: "Goodbye", language: "en" },
-        suggestions: [{
-          messageId: "replaceWithValue",
-          output: withI18n("en", "greeting: greeting\nGoodbye: Goodbye"),
-        }],
-      }],
+      errors: [
+        {
+          messageId: "mismatch",
+          data: { key: "farewell", value: "Goodbye", language: "en" },
+          suggestions: [
+            {
+              messageId: "replaceWithValue",
+              output: withI18n("en", "greeting: greeting\nGoodbye: Goodbye"),
+            },
+          ],
+        },
+      ],
     },
     {
       filename: "test.vue",
       code: withI18n("hu", "farewell: Viszlát"),
       options: [{ locale: "hu" }],
-      errors: [{
-        messageId: "mismatch",
-        data: { key: "farewell", value: "Viszlát", language: "hu" },
-        suggestions: [{
-          messageId: "replaceWithValue",
-          output: withI18n("hu", "Viszlát: Viszlát"),
-        }],
-      }],
+      errors: [
+        {
+          messageId: "mismatch",
+          data: { key: "farewell", value: "Viszlát", language: "hu" },
+          suggestions: [
+            {
+              messageId: "replaceWithValue",
+              output: withI18n("hu", "Viszlát: Viszlát"),
+            },
+          ],
+        },
+      ],
     },
   ],
 })

@@ -29,51 +29,67 @@ tester.run("key-equals-plural-value", rule, {
     {
       filename: "test.vue",
       code: withI18n("en", ["items: one item | many items"]),
-      errors: [{
-        messageId: "mismatch",
-        data: { key: "items", language: "en", expected: "many items" },
-        suggestions: [{
-          messageId: "replaceWithExpected",
-          output: withI18n("en", ["many items: one item | many items"]),
-        }],
-      }],
+      errors: [
+        {
+          messageId: "mismatch",
+          data: { key: "items", language: "en", expected: "many items" },
+          suggestions: [
+            {
+              messageId: "replaceWithExpected",
+              output: withI18n("en", ["many items: one item | many items"]),
+            },
+          ],
+        },
+      ],
     },
     {
       filename: "test.vue",
       code: withI18n("en", ["items: one item | {n} items"]),
-      errors: [{
-        messageId: "mismatch",
-        data: { key: "items", language: "en", expected: "N items" },
-        suggestions: [{
-          messageId: "replaceWithExpected",
-          output: withI18n("en", ["N items: one item | {n} items"]),
-        }],
-      }],
+      errors: [
+        {
+          messageId: "mismatch",
+          data: { key: "items", language: "en", expected: "N items" },
+          suggestions: [
+            {
+              messageId: "replaceWithExpected",
+              output: withI18n("en", ["N items: one item | {n} items"]),
+            },
+          ],
+        },
+      ],
     },
     {
       filename: "test.vue",
       code: withI18n("en", ["items: one item | {n} items", "greeting: greeting"]),
-      errors: [{
-        messageId: "mismatch",
-        data: { key: "items", language: "en", expected: "N items" },
-        suggestions: [{
-          messageId: "replaceWithExpected",
-          output: withI18n("en", ["N items: one item | {n} items", "greeting: greeting"]),
-        }],
-      }],
+      errors: [
+        {
+          messageId: "mismatch",
+          data: { key: "items", language: "en", expected: "N items" },
+          suggestions: [
+            {
+              messageId: "replaceWithExpected",
+              output: withI18n("en", ["N items: one item | {n} items", "greeting: greeting"]),
+            },
+          ],
+        },
+      ],
     },
     {
       filename: "test.vue",
       code: withI18n("uk", ["items: один елемент | багато елементів"]),
       options: [{ locale: "uk" }],
-      errors: [{
-        messageId: "mismatch",
-        data: { key: "items", language: "uk", expected: "багато елементів" },
-        suggestions: [{
-          messageId: "replaceWithExpected",
-          output: withI18n("uk", ["багато елементів: один елемент | багато елементів"]),
-        }],
-      }],
+      errors: [
+        {
+          messageId: "mismatch",
+          data: { key: "items", language: "uk", expected: "багато елементів" },
+          suggestions: [
+            {
+              messageId: "replaceWithExpected",
+              output: withI18n("uk", ["багато елементів: один елемент | багато елементів"]),
+            },
+          ],
+        },
+      ],
     },
   ],
 })

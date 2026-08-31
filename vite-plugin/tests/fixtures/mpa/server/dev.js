@@ -1,6 +1,8 @@
-import { createServer } from "node:http"
 import { readFileSync } from "node:fs"
+import { createServer } from "node:http"
+
 import { createServer as createViteServer } from "vite"
+
 import { root } from "./shared.js"
 
 export async function setup() {

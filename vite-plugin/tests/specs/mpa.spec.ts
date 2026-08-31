@@ -1,7 +1,7 @@
 import { expect, test } from "@playwright/test"
+
 import { collectTranslations, trackLoaded } from "../utils/network"
 import { pageSettled } from "../utils/page"
-
 
 test.describe("server-side routing", () => {
   test("/en renders Home content in the initial HTML", async ({ page }) => {

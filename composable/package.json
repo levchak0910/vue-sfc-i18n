@@ -3,41 +3,41 @@
   "version": "0.0.5",
   "description": "Vue composable for using i18n translations from Vue SFC custom blocks",
   "keywords": [
-    "vue",
-    "vue3",
-    "i18n",
-    "sfc",
     "composable",
-    "internationalization"
+    "i18n",
+    "internationalization",
+    "sfc",
+    "vue",
+    "vue3"
   ],
-  "author": "Sándor Levcsák",
-  "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/levchak0910/vue-sfc-i18n.git"
-  },
   "homepage": "git+https://github.com/levchak0910/vue-sfc-i18n#readme",
   "bugs": {
     "url": "git+https://github.com/levchak0910/vue-sfc-i18n/issues"
   },
+  "license": "MIT",
+  "author": "Sándor Levcsák",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/levchak0910/vue-sfc-i18n.git"
+  },
+  "files": [
+    "dist"
+  ],
+  "type": "module",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": "./dist/index.js"
+  },
   "publishConfig": {
     "access": "public",
-    "registry": "https://registry.npmjs.org/",
-    "provenance": true
+    "provenance": true,
+    "registry": "https://registry.npmjs.org/"
   },
-  "type": "module",
   "scripts": {
     "build": "tsc --noEmit false --allowImportingTsExtensions false --declaration true --outDir dist",
     "type-check": "tsc --noEmit",
     "test": "vitest run"
   },
-  "exports": {
-    ".": "./dist/index.js"
-  },
-  "types": "./dist/index.d.ts",
-  "files": [
-    "dist"
-  ],
   "dependencies": {
     "vue": "^3.5.0"
   },

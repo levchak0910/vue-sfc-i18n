@@ -1,8 +1,8 @@
 import type { Rule } from "eslint"
 
 import { getI18N } from "../utils/get-block.js"
-import { getDocumentFragment } from "../utils/parser-services.js"
 import { forEachKeyValue } from "../utils/get-language-block-content.js"
+import { getDocumentFragment } from "../utils/parser-services.js"
 
 type Spacing = "always" | "never"
 
@@ -16,7 +16,7 @@ const rule: Rule.RuleModule = {
       {
         type: "object",
         properties: {
-          spacing: { type: "string", enum: [ "never", "always" ] },
+          spacing: { type: "string", enum: ["never", "always"] },
         },
         additionalProperties: false,
       },
@@ -28,17 +28,15 @@ const rule: Rule.RuleModule = {
       pluralOnlyN: "Pluralized values only allow '{n}' as interpolation param, got '{{ name }}'.",
     },
   },
-  create (context) {
+  create(context) {
     const spacing: Spacing = (context.options[0] as undefined | { spacing?: Spacing })?.spacing ?? "never"
 
     return {
-      Program () {
-        if (!context.filename.endsWith(".vue"))
-          return
+      Program() {
+        if (!context.filename.endsWith(".vue")) return
 
         const df = getDocumentFragment(context)
-        if (df === null)
-          return
+        if (df === null) return
 
         const src = context.sourceCode.getText()
 
@@ -66,10 +64,14 @@ const rule: Rule.RuleModule = {
                   loc: param.loc,
                   messageId: spacing === "always" ? "spacingAlways" : "spacingNever",
                   data: { name: param.name },
-                  fix: fixer => fixer.replaceTextRange(
-                    [ context.sourceCode.getIndexFromLoc(param.loc.start), context.sourceCode.getIndexFromLoc(param.loc.end) ],
-                    correctParam,
-                  ),
+                  fix: fixer =>
+                    fixer.replaceTextRange(
+                      [
+                        context.sourceCode.getIndexFromLoc(param.loc.start),
+                        context.sourceCode.getIndexFromLoc(param.loc.end),
+                      ],
+                      correctParam,
+                    ),
                 })
               }
             }

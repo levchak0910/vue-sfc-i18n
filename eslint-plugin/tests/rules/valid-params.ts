@@ -92,9 +92,7 @@ tester.run("valid-params", rule, {
     {
       filename: "test.vue",
       code: withI18n("en", ["items: one {name} item | {n} items"]),
-      errors: [
-        { messageId: "pluralOnlyN", data: { name: "name" } },
-      ],
+      errors: [{ messageId: "pluralOnlyN", data: { name: "name" } }],
     },
     {
       filename: "test.vue",

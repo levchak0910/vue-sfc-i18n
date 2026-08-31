@@ -8,11 +8,11 @@ tester.run("no-raw-text", rule, {
   valid: [
     // template literals
     { filename: "test.vue", code: sfc("<p>{{ `${a} ${b}` }}</p>") },
-    { filename: "test.vue", code: sfc("<p :title=\"`${expr}`\"></p>") },
+    { filename: "test.vue", code: sfc('<p :title="`${expr}`"></p>') },
     { filename: "test.ts", code: "const s = `raw text in non-vue file`" },
     {
       filename: "test.vue",
-      code: sfc("<p :title=\"`prefix${n} ignored text`\"></p>"),
+      code: sfc('<p :title="`prefix${n} ignored text`"></p>'),
       options: [{ ignorePattern: ["^prefix$"], ignoreText: ["ignored text"] }],
     },
     {
@@ -41,12 +41,12 @@ tester.run("no-raw-text", rule, {
     { filename: "test.vue", code: sfc("<p>{{ 'snake_case' }}</p>") },
     { filename: "test.vue", code: sfc("<p>{{ 'SCREAMING_SNAKE_CASE' }}</p>") },
     { filename: "test.vue", code: sfc("<p>{{ 'PascalCase' }}</p>") },
-    { filename: "test.vue", code: sfc("<p title=\"PascalCase\" />") },
-    { filename: "test.vue", code: sfc("<p title=\"word\" />") },
-    { filename: "test.vue", code: sfc("<p title=\"camelCase\" />") },
-    { filename: "test.vue", code: sfc("<p title=\"kebab-case\" />") },
-    { filename: "test.vue", code: sfc("<p title=\"snake_case\" />") },
-    { filename: "test.vue", code: sfc("<p title=\"SCREAMING_SNAKE_CASE\" />") },
+    { filename: "test.vue", code: sfc('<p title="PascalCase" />') },
+    { filename: "test.vue", code: sfc('<p title="word" />') },
+    { filename: "test.vue", code: sfc('<p title="camelCase" />') },
+    { filename: "test.vue", code: sfc('<p title="kebab-case" />') },
+    { filename: "test.vue", code: sfc('<p title="snake_case" />') },
+    { filename: "test.vue", code: sfc('<p title="SCREAMING_SNAKE_CASE" />') },
     // checkJS off for ts files
     { filename: "test.ts", code: "const s = 'raw text'" },
     { filename: "test.ts", code: "const s = `raw text`" },
@@ -130,24 +130,24 @@ tester.run("no-raw-text", rule, {
       options: [{ ignorePattern: ["^raw"] }],
     },
     // id attribute (default ignored)
-    { filename: "test.vue", code: sfc("<p id=\"raw text\" />") },
+    { filename: "test.vue", code: sfc('<p id="raw text" />') },
     { filename: "test.vue", code: sfc("<p :id=\"'raw text'\" />") },
     // VLiteral (static attributes)
-    { filename: "test.vue", code: sfc("<p style=\"color: red\" />") },
-    { filename: "test.vue", code: sfc("<p class=\"my-class other-class\" />") },
+    { filename: "test.vue", code: sfc('<p style="color: red" />') },
+    { filename: "test.vue", code: sfc('<p class="my-class other-class" />') },
     { filename: "test.vue", code: sfc("<p :style=\"{ '--prop': val }\" />") },
-    { filename: "test.vue", code: sfc("<p :class=\"{ active: flag }\" />") },
-    { filename: "test.vue", code: sfc("<template #[`${expr}Suffix`]=\"{ item }\"></template>") },
-    { filename: "test.vue", code: sfc("<p v-for=\"item in items\" :key=\"'static-key'\" />") },
-    { filename: "test.vue", code: sfc("<p title=\"   \" />") },
+    { filename: "test.vue", code: sfc('<p :class="{ active: flag }" />') },
+    { filename: "test.vue", code: sfc('<template #[`${expr}Suffix`]="{ item }"></template>') },
+    { filename: "test.vue", code: sfc('<p v-for="item in items" :key="\'static-key\'" />') },
+    { filename: "test.vue", code: sfc('<p title="   " />') },
     {
       filename: "test.vue",
-      code: sfc("<p title=\"ignored text\" />"),
+      code: sfc('<p title="ignored text" />'),
       options: [{ ignoreText: ["ignored text"] }],
     },
     {
       filename: "test.vue",
-      code: sfc("<p title=\"ignored text\" />"),
+      code: sfc('<p title="ignored text" />'),
       options: [{ ignorePattern: ["^ignored"] }],
     },
     // path-like strings excluded
@@ -170,7 +170,7 @@ tester.run("no-raw-text", rule, {
     },
     {
       filename: "test.vue",
-      code: sfc("<!-- @vue-sfc-i18n allowText: raw text -->\n<p title=\"raw text\" />"),
+      code: sfc('<!-- @vue-sfc-i18n allowText: raw text -->\n<p title="raw text" />'),
     },
     // comment directives — ignoreNodes
     {
@@ -190,7 +190,7 @@ tester.run("no-raw-text", rule, {
     },
     {
       filename: "test.vue",
-      code: sfc("<p title=\"raw text\" />"),
+      code: sfc('<p title="raw text" />'),
       options: [{ ignoreNodes: ["VAttribute[key.rawName='title']"] }],
     },
   ],
@@ -198,10 +198,8 @@ tester.run("no-raw-text", rule, {
     // template literals
     {
       filename: "test.vue",
-      code: sfc("<p :title=\"`prefix${expr} raw text`\"></p>"),
-      errors: [
-        { messageId: "rawText", data: { text: "raw text" } },
-      ],
+      code: sfc('<p :title="`prefix${expr} raw text`"></p>'),
+      errors: [{ messageId: "rawText", data: { text: "raw text" } }],
     },
     {
       filename: "test.vue",
@@ -293,7 +291,7 @@ tester.run("no-raw-text", rule, {
     // VLiteral (static attributes)
     {
       filename: "test.vue",
-      code: sfc("<p title=\"raw text\" />"),
+      code: sfc('<p title="raw text" />'),
       errors: [{ messageId: "rawText", data: { text: "raw text" } }],
     },
     // ignoreNodes — Vue nodes, non-matching
@@ -305,7 +303,7 @@ tester.run("no-raw-text", rule, {
     },
     {
       filename: "test.vue",
-      code: sfc("<p title=\"raw text\" />"),
+      code: sfc('<p title="raw text" />'),
       options: [{ ignoreNodes: ["VAttribute[key.rawName='other']"] }],
       errors: [{ messageId: "rawText", data: { text: "raw text" } }],
     },

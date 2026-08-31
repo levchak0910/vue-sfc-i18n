@@ -1,5 +1,6 @@
-import { createSSRApp, type Component } from "vue"
 import { manager } from "@vue-sfc-i18n/composable"
+import { createSSRApp, type Component } from "vue"
+
 import { parsePath } from "../../shared/routing"
 
 const { lang, view } = parsePath(window.location.pathname)

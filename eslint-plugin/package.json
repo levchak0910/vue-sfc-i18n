@@ -3,42 +3,42 @@
   "version": "0.0.5",
   "description": "ESLint plugin for enforcing i18n conventions in Vue SFC custom blocks",
   "keywords": [
-    "vue",
-    "vue3",
-    "i18n",
-    "sfc",
     "eslint",
     "eslint-plugin",
-    "internationalization"
+    "i18n",
+    "internationalization",
+    "sfc",
+    "vue",
+    "vue3"
   ],
-  "author": "Sándor Levcsák",
-  "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/levchak0910/vue-sfc-i18n.git"
-  },
   "homepage": "git+https://github.com/levchak0910/vue-sfc-i18n#readme",
   "bugs": {
     "url": "git+https://github.com/levchak0910/vue-sfc-i18n/issues"
   },
+  "license": "MIT",
+  "author": "Sándor Levcsák",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/levchak0910/vue-sfc-i18n.git"
+  },
+  "files": [
+    "dist"
+  ],
+  "type": "module",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": "./dist/index.js"
+  },
   "publishConfig": {
     "access": "public",
-    "registry": "https://registry.npmjs.org/",
-    "provenance": true
+    "provenance": true,
+    "registry": "https://registry.npmjs.org/"
   },
-  "type": "module",
   "scripts": {
     "build": "tsc --noEmit false --allowImportingTsExtensions false --declaration true --outDir dist",
     "type-check": "tsc --noEmit",
     "test": "vitest run"
   },
-  "exports": {
-    ".": "./dist/index.js"
-  },
-  "types": "./dist/index.d.ts",
-  "files": [
-    "dist"
-  ],
   "dependencies": {
     "eslint": "^10.3.0",
     "esquery": "^1.7.0"

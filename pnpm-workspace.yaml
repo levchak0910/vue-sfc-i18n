@@ -1,6 +1,6 @@
 packages:
-  - 'shared'
-  - 'composable'
-  - 'generate'
-  - 'vite-plugin'
-  - 'eslint-plugin'
+  - "shared"
+  - "composable"
+  - "generate"
+  - "vite-plugin"
+  - "eslint-plugin"
