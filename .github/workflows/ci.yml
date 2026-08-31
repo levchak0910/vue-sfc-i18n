@@ -3,9 +3,28 @@ name: CI
 on:
   push:
     branches: [main]
+  pull_request:
+    branches: [main]
   workflow_call:
 
 jobs:
+  commitlint:
+    runs-on: ubuntu-latest
+    if: ${{ !startsWith(github.ref, 'refs/tags/v') }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: ./.github/actions/install
+      - run: |
+          if [ -n "${{ github.event.pull_request.base.sha }}" ]; then                                                                                                
+            pnpm commitlint --from ${{ github.event.pull_request.base.sha }} --to ${{ github.event.pull_request.head.sha }}                                          
+          elif [ "${{ github.event.forced }}" = "true" ]; then                                                                                                       
+            pnpm commitlint --last                                                                                                                                   
+          else                                                                                                                                                       
+            pnpm commitlint --from ${{ github.event.before }} --to ${{ github.sha }}                                                                                 
+          fi
+
   fmt:
     runs-on: ubuntu-latest
     steps:
