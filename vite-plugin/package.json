@@ -1,6 +1,6 @@
 {
   "name": "@vue-sfc-i18n/vite-plugin",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "Vite plugin for transforming Vue SFC i18n custom blocks at build time",
   "keywords": [
     "i18n",
