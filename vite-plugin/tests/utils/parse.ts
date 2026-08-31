@@ -1,12 +1,39 @@
-export function parseDevTranslations(body: string): Record<string, string> {
-  const match = body.match(/export default ({.*})/)
-  return match ? JSON.parse(match[1]) : {}
-}
+import { parseSync, Visitor } from "oxc-parser"
 
-export function parseProdTranslations(body: string): Record<string, string> {
+export function parseTranslations (body: string): Record<string, string> {
   const result: Record<string, string> = {}
-  const re = /(?:"([^"]+)"|(\w+)):`([^`]*)`/g
-  let m
-  while ((m = re.exec(body)) !== null) result[m[1] ?? m[2]] = m[3]
+  const { program } = parseSync("chunk.js", body)
+
+  const visitor = new Visitor({
+    Property (prop) {
+      if (prop.computed) return
+
+      let key: string | null = null
+      if (prop.key.type === "Identifier") {
+        key = prop.key.name
+      }
+      else if (prop.key.type === "Literal" && typeof prop.key.value === "string") {
+        key = prop.key.value
+      }
+
+      if (key === null)
+        return
+
+      let value: string | null = null
+      if (prop.value.type === "Literal" && typeof prop.value.value === "string") {
+        value = prop.value.value
+      }
+      else if (prop.value.type === "TemplateLiteral" && prop.value.expressions.length === 0) {
+        const [part] = prop.value.quasis
+        value = part.value.cooked ?? part.value.raw
+      }
+
+      if (value !== null)
+        result[key] = value
+    },
+  })
+  
+  visitor.visit(program)
+
   return result
 }

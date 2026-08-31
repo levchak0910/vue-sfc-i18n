@@ -51,14 +51,16 @@
   "dependencies": {
     "@vue-sfc-i18n/generate": "workspace:*",
     "@vue-sfc-i18n/shared": "workspace:*",
+    "@vue/compiler-sfc": "^3.5.41",
+    "oxc-parser": "^0.147.0",
     "picomatch": "^4.0.5"
   },
   "devDependencies": {
-    "@vue-sfc-i18n/composable": "workspace:*",
     "@playwright/test": "^1.62.1",
     "@types/node": "^24.12.2",
     "@types/picomatch": "^4.0.3",
     "@vitejs/plugin-vue": "^6.0.8",
+    "@vue-sfc-i18n/composable": "workspace:*",
     "typescript": "^5.9.3",
     "vite": "^8.0.0",
     "vue": "^3.5.41"

@@ -1,5 +1,5 @@
 import type { Page } from "@playwright/test"
-import { parseDevTranslations, parseProdTranslations } from "./parse"
+import { parseTranslations } from "./parse"
 import { pageSettled } from "./page"
 
 export type Mode = "dev" | "prod"
@@ -16,7 +16,7 @@ const strategies: Record<Mode, Strategy> = {
   dev: {
     isTranslation: url => url.includes("__x00__virtual:i18n"),
     matchesEntry: (url, entry) => url.includes(`__x00__virtual:i18n/entry/${entry}`),
-    parse: parseDevTranslations,
+    parse: parseTranslations,
     viewLoaded: (urls, view) => urls.some(u => u.includes(`__x00__virtual:i18n/entry/views-${view}`)),
     langLoaded: (urls, lang) => urls.some(u => u.includes("__x00__virtual:i18n/entry") && u.endsWith(`/${lang}`)),
   },
@@ -26,7 +26,7 @@ const strategies: Record<Mode, Strategy> = {
       const lang = entry.split("/").pop() ?? "en"
       return new RegExp(`/assets/${lang}-[^.]+\\.js`).test(url)
     },
-    parse: parseProdTranslations,
+    parse: parseTranslations,
     viewLoaded: (urls, view) => {
       const name = view.charAt(0).toUpperCase() + view.slice(1)
       return urls.some(u => new RegExp(`/assets/${name}-[^.]+\\.js`).test(u))

@@ -2,6 +2,8 @@ import { readFileSync } from "node:fs"
 import { join, relative, sep } from "node:path"
 
 import type { Plugin, ResolvedConfig, ViteDevServer } from "vite"
+import { parse as parseSFC } from "@vue/compiler-sfc"
+import { parseSync as parseJS, Visitor } from "oxc-parser"
 import picomatch from "picomatch"
 import { extractTranslations, walkVueFiles, type Translations } from "@vue-sfc-i18n/shared"
 import { generateKeys } from "@vue-sfc-i18n/generate"
@@ -19,14 +21,28 @@ function toEntryKey (relPath: string): string {
 type Resolver = (id: string, importer: string) => Promise<null | string>
 
 function extractVueImports (code: string): string[] {
+  const { descriptor } = parseSFC(code)
   const imports: string[] = []
-  const regex = /\bimport\s+(?:type\s+)?(?:[\s\S]*?\s+from\s+)?['"](?<path>[^'"]+\.vue)['"]/gmu
-  let match = regex.exec(code)
-  // eslint-disable-next-line ts/strict-boolean-expressions -- skip
-  while (match?.groups) {
-    imports.push(match.groups.path)
-    match = regex.exec(code)
+
+  for (const block of [descriptor.script, descriptor.scriptSetup]) {
+    if (block === null) continue
+
+    const { program } = parseJS("script.ts", block.content)
+
+    const visitor = new Visitor({
+      ImportDeclaration(node) {
+        if (node.source.value.endsWith(".vue"))
+          imports.push(node.source.value)
+      },
+      ImportExpression(node) {
+        if (node.source.type === "Literal" && typeof node.source.value === "string" && node.source.value.endsWith(".vue"))
+          imports.push(node.source.value)
+      },
+    });
+
+    visitor.visit(program)
   }
+
   return imports
 }
 

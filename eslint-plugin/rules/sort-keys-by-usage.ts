@@ -1,25 +1,52 @@
 import type { Rule } from "eslint"
+import type { AST } from "vue-eslint-parser"
 
-import { getI18N, getScripts, getTemplate } from "../utils/get-block.js"
+import { getI18N } from "../utils/get-block.js"
 import { getDocumentFragment } from "../utils/parser-services.js"
 
-function extractKeyOrder (templateSource: string, scriptSource: string): string[] {
+const SKIP_KEYS = new Set([ "parent", "scope", "tokens", "comments" ])
+
+function visit (
+  node: Rule.Node | undefined | null,
+  fn: (n: Rule.Node) => void,
+  seen = new Set<Rule.Node>(),
+): void {
+  if (!node) return
+  if (seen.has(node)) return
+
+  seen.add(node)
+  fn(node)
+
+  for (const [ key, val ] of Object.entries(node)) {
+    if (SKIP_KEYS.has(key)) continue
+    if (Array.isArray(val)) val.forEach(item => visit(item, fn, seen))
+    else visit(val, fn, seen)
+  }
+}
+
+function extractKeyOrder (context: Rule.RuleContext, df: AST.VDocumentFragment): string[] {
   const keys: string[] = []
   const seen = new Set<string>()
-  const re = /\bt\((?:"(?<dq>[^"]+)"|'(?<sq>[^']+)')/gu
 
-  const collect = (text: string) => {
-    for (const m of text.matchAll(re)) {
-      const key = m.groups?.dq ?? m.groups?.sq
-      if (key === undefined || seen.has(key))
-        continue
-      seen.add(key)
-      keys.push(key)
-    }
+  const collect = (root: Rule.Node) => {
+    visit(root, node => {
+      if (
+        node.type === "CallExpression"
+        && node.callee.type === "Identifier"
+        && node.callee.name === "t"
+      ) {
+        const arg = node.arguments[0]
+        if (arg?.type === "Literal" && typeof arg.value === "string" && !seen.has(arg.value)) {
+          seen.add(arg.value)
+          keys.push(arg.value)
+        }
+      }
+    })
   }
 
-  collect(templateSource)
-  collect(scriptSource)
+  const template = df.children.find(n => n.type === "VElement" && n.name === "template")
+  if (template) collect(template as unknown as Rule.Node)
+  collect(context.sourceCode.ast as unknown as Rule.Node)
 
   return keys
 }
@@ -88,11 +115,9 @@ const rule: Rule.RuleModule = {
         if (df === null)
           return
 
-        const templateText = getTemplate(context, df)?.content ?? ""
-        const scriptText = getScripts(context, df).map(s => s.content).join("\n")
         const i18nBlocks = getI18N(context, df)
 
-        const usageOrder = extractKeyOrder(templateText, scriptText)
+        const usageOrder = extractKeyOrder(context, df)
         if (usageOrder.length === 0)
           return
 

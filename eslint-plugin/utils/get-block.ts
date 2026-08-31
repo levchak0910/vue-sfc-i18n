@@ -18,31 +18,6 @@ const getContentLine = (node: AST.VElement | AST.VExpressionContainer | AST.VSty
   node.loc.start.line
 )
 
-export function getTemplate (context: Rule.RuleContext, df: AST.VDocumentFragment): null | Expose {
-  const template = df.children.find(child => child.type === "VElement" && child.name === "template")
-
-  if (template?.type !== "VElement")
-    return null
-
-  return {
-    // @ts-expect-error -- element is eslint node compatible but has problems with typings
-    content: context.sourceCode.getText(template),
-    contentRange: getContentRange(template, context.sourceCode.getText()),
-    contentLine: getContentLine(template),
-  }
-}
-
-export function getScripts (context: Rule.RuleContext, df: AST.VDocumentFragment): Expose[] {
-  const scripts = df.children.filter(child => child.type === "VElement" && child.name === "script")
-
-  return scripts.map(script => ({
-    // @ts-expect-error -- element is eslint node compatible but has problems with typings
-    content: context.sourceCode.getText(script),
-    contentRange: getContentRange(script, context.sourceCode.getText()),
-    contentLine: getContentLine(script),
-  }))
-}
-
 export function getI18N (context: Rule.RuleContext, df: AST.VDocumentFragment): Array<Expose & { language: string }> {
   const i18n = df.children.filter(child => child.type === "VElement" && child.name === "i18n")
 
