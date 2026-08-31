@@ -1,12 +1,18 @@
 {
   "name": "vue-sfc-i18n",
-  "packageManager": "pnpm@11.22.0",
+  "type": "module",
   "scripts": {
+    "prepare": "husky",
+    "fmt": "oxfmt --no-error-on-unmatched-pattern",
+    "fmt:check": "pnpm fmt --check",
     "build": "pnpm -r build",
     "test": "pnpm -r test && pnpm -F vite-plugin test:e2e",
     "bump": "bumpp -r --commit \"chore: release {tag}\" --tag \"v{version}\" --no-push"
   },
-  "dependencies": {
-    "bumpp": "^12.2.1"
-  }
+  "devDependencies": {
+    "bumpp": "^12.2.2",
+    "husky": "^9.1.7",
+    "oxfmt": "^0.65.0"
+  },
+  "packageManager": "pnpm@11.22.0"
 }

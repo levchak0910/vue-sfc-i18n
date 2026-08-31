@@ -6,6 +6,13 @@ on:
   workflow_call:
 
 jobs:
+  fmt:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: ./.github/actions/install
+      - run: pnpm fmt:check
+
   type-check:
     runs-on: ubuntu-latest
     steps:
