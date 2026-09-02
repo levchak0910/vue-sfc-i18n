@@ -1,3 +1,6 @@
+import * as fs from "node:fs"
+import * as url from "node:url"
+
 import { expect, test } from "@playwright/test"
 
 import { collectTranslations, trackLoaded } from "../utils/network"
@@ -301,6 +304,60 @@ test.describe("lazy loading @dev-only", () => {
 
     await page.getByTestId("btn-hu").click()
     expect(getLoaded().hasLang("hu")).toBe(true)
+  })
+})
+
+test.describe("HMR: translation updates", () => {
+  const fixturePath = url.fileURLToPath(new URL("../fixtures/spa/src/views/Home.vue", import.meta.url))
+  let originalContent: string
+
+  test.beforeEach(async () => {
+    originalContent = fs.readFileSync(fixturePath, "utf-8")
+  })
+
+  test.afterEach(async () => {
+    fs.writeFileSync(fixturePath, originalContent)
+  })
+
+  test("applies changed translation and new key via HMR without page reload @dev-only", async ({ page }) => {
+    await page.goto("/en")
+    await expect(page.getByTestId("farewell")).toHaveText("Goodbye")
+    await expect(page.getByTestId("motto")).toHaveCount(0)
+
+    // Detect full page reload: this value won't survive one
+    await page.evaluate(() => {
+      ;(window as unknown as Record<string, unknown>).__hmrMarker = true
+    })
+
+    const modified = originalContent
+      .replace(
+        '<p data-testid="farewell">{{ t("farewell") }}</p>',
+        '<p data-testid="farewell">{{ t("farewell") }}</p>\n    <p data-testid="motto">{{ t("motto") }}</p>',
+      )
+      .replace("farewell: Goodbye", "farewell: See you later!")
+      .replace("items: item | items", "items: item | items\nmotto: Created with Vue")
+
+    fs.writeFileSync(fixturePath, modified)
+
+    await expect(page.getByTestId("farewell")).toHaveText("See you later!", { timeout: 10_000 })
+    await expect(page.getByTestId("motto")).toHaveText("Created with Vue", { timeout: 10_000 })
+    expect(await page.evaluate(() => (window as unknown as Record<string, unknown>).__hmrMarker)).toBe(true)
+  })
+
+  test("import.meta.hot is dead-code eliminated from all JS chunks @prod-only", async ({ page }) => {
+    const pending: Promise<string>[] = []
+    page.on("response", r => {
+      if (r.url().match(/\.js(\?|$)/)) pending.push(r.text())
+    })
+
+    await page.goto("/en")
+    await pageSettled(page)
+
+    const bodies = await Promise.all(pending)
+    for (const body of bodies) {
+      expect(body).not.toContain("import.meta.hot")
+      expect(body).not.toContain("i18n:update")
+    }
   })
 })
 

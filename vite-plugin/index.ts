@@ -122,9 +122,14 @@ export function i18nPlugin({
   }
 
   function invalidateVirtualModules(server: ViteDevServer): void {
-    for (const key of entryMap.keys()) {
-      const mod = server.moduleGraph.getModuleById(`${RESOLVED_PREFIX}entry/${key}`)
-      if (mod !== undefined) server.moduleGraph.invalidateModule(mod)
+    for (const [key, translations] of entryMap.entries()) {
+      const entryMod = server.moduleGraph.getModuleById(`${RESOLVED_PREFIX}entry/${key}`)
+      if (entryMod !== undefined) server.moduleGraph.invalidateModule(entryMod)
+
+      for (const lang of Object.keys(translations)) {
+        const langMod = server.moduleGraph.getModuleById(`${RESOLVED_PREFIX}entry/${key}/${lang}`)
+        if (langMod !== undefined) server.moduleGraph.invalidateModule(langMod)
+      }
     }
   }
 
@@ -195,6 +200,7 @@ export function i18nPlugin({
 
       return [
         "import { manager } from '@vue-sfc-i18n/composable'",
+        `const _entry = ${JSON.stringify(afterEntry)}`,
         `const _loaders = {\n${loaders}\n}`,
         "async function _load() {",
         "  const _fn = _loaders[manager.getLanguage()]",
@@ -202,19 +208,34 @@ export function i18nPlugin({
         "}",
         "manager.registerEntryLoader(_load)",
         "manager.mergeTranslations(await _load())",
+        "if (import.meta.hot) {",
+        "  import.meta.hot.on('i18n:update', ({ entries }) => {",
+        "    const dict = entries[_entry]",
+        "    if (dict) manager.mergeTranslations(dict[manager.getLanguage()] ?? {})",
+        "  })",
+        "}",
         "export {}",
       ].join("\n")
     },
 
     async handleHotUpdate({ file, server }) {
-      if (!file.endsWith(".vue")) {
-        const translations = extractTranslations(readFileSync(file, "utf-8"))
-        if (Object.keys(translations).length > 0) {
-          await buildAll()
-          invalidateVirtualModules(server)
-          server.ws.send({ type: "full-reload" })
-          return []
-        }
+      if (file.endsWith(".vue")) {
+        await buildAll()
+        invalidateVirtualModules(server)
+        server.ws.send({
+          type: "custom",
+          event: "i18n:update",
+          data: { entries: Object.fromEntries(entryMap) },
+        })
+        return undefined
+      }
+
+      const translations = extractTranslations(readFileSync(file, "utf-8"))
+      if (Object.keys(translations).length > 0) {
+        await buildAll()
+        invalidateVirtualModules(server)
+        server.ws.send({ type: "full-reload" })
+        return []
       }
 
       return undefined
