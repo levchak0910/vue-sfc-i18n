@@ -1,6 +1,6 @@
 {
   "name": "@vue-sfc-i18n/composable",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "Vue composable for using i18n translations from Vue SFC custom blocks",
   "keywords": [
     "composable",
