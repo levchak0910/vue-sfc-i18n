@@ -74,6 +74,56 @@ test.describe("server-side routing", () => {
   })
 })
 
+test.describe("server-side rendering: concurrency", () => {
+  test("concurrent requests in different languages render each in its own language", async ({ page }) => {
+    const paths = Array.from({ length: 40 }, (_, i) => (i % 2 === 0 ? "/en" : "/hu"))
+    const pageContents = await Promise.all(
+      paths.map(async path => {
+        const response = await page.request.get(path)
+        const content = await response.text()
+        return { path, content }
+      }),
+    )
+    const en = "Hello, World!"
+    const hu = "Szia, World!"
+
+    expect(
+      pageContents.filter(p => p.path === "/en").every(p => p.content.includes(en) && !p.content.includes(hu)),
+    ).toEqual(true)
+    expect(
+      pageContents.filter(p => p.path === "/hu").every(p => p.content.includes(hu) && !p.content.includes(en)),
+    ).toEqual(true)
+  })
+
+  test("concurrent requests to different views keep each view and language", async ({ page }) => {
+    const texts: Record<string, string> = {
+      "/en/about": "About Us",
+      "/hu/about": "Rólunk",
+      "/en/contacts": "Contact Us",
+      "/hu/contacts": "Kapcsolat",
+    }
+    const views = Object.keys(texts)
+    const paths = Array.from({ length: 40 }, (_, i) => views[i % views.length])
+    const pageContents = await Promise.all(
+      paths.map(async path => {
+        const response = await page.request.get(path)
+        const content = await response.text()
+        return { path, content }
+      }),
+    )
+
+    for (const view of views) {
+      const others = views.filter(v => v !== view).map(v => texts[v])
+
+      expect(
+        pageContents
+          .filter(p => p.path === view)
+          .every(p => p.content.includes(texts[view]) && others.every(text => !p.content.includes(text))),
+      ).toEqual(true)
+    }
+  })
+})
+
 test.describe("Home: rendering", () => {
   test("renders English translations after hydration", async ({ page }) => {
     await page.goto("/en")
@@ -368,6 +418,27 @@ test.describe("loader chunk @dev-only", () => {
     expect(body).toContain("entry/views-home/hu")
     expect(body).not.toContain("views-about")
     expect(body).not.toContain("views-contacts")
+  })
+
+  test("loader receives the language instead of reading the global one", async ({ page }) => {
+    await page.goto("/en")
+    const resp = await page.request.get("/@id/__x00__virtual:i18n/entry/views-home")
+    const body = await resp.text()
+
+    expect(body).toContain("async function _load(language)")
+    expect(body).toContain("_loaders[language]")
+    expect(body).toContain("await manager.registerEntryLoader(_load)")
+    expect(body).not.toContain("manager.getLanguage()")
+  })
+
+  test("HMR update merges translations of every language", async ({ page }) => {
+    await page.goto("/en")
+    const resp = await page.request.get("/@id/__x00__virtual:i18n/entry/views-home")
+    const body = await resp.text()
+
+    expect(body).toContain(
+      "for (const [language, data] of Object.entries(dict)) manager.mergeTranslations(data, language)",
+    )
   })
 })
 

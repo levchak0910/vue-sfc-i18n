@@ -1,4 +1,4 @@
-import { manager } from "@vue-sfc-i18n/composable"
+import { createI18n, manager } from "@vue-sfc-i18n/composable"
 import { createSSRApp, type Component } from "vue"
 import { renderToString } from "vue/server-renderer"
 
@@ -15,5 +15,8 @@ export async function render(url: string): Promise<string> {
   }
 
   const Page = await loadView()
-  return renderToString(createSSRApp(Page, { lang, view }))
+  const app = createSSRApp(Page, { lang, view })
+  app.use(createI18n(lang))
+
+  return renderToString(app)
 }
